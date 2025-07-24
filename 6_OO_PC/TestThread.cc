@@ -11,7 +11,7 @@ using std::cout;
 using std::endl;
 using std::unique_ptr;
 
-class MyThread : public wd::Thread
+class MyThread : public wdf::Thread
 {
     void run() override 
     {
@@ -27,7 +27,7 @@ class MyThread : public wd::Thread
 
 int main()
 {
-    unique_ptr<wd::Thread> thread(new MyThread());
+    unique_ptr<wdf::Thread> thread(new MyThread());
     thread->start();
     thread->join();
     printf("main thread is exiting. \n"); // 相对于 cout 更高效

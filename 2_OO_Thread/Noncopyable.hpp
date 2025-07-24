@@ -1,6 +1,6 @@
 #ifndef NONCOPYABLE_H
 #define NONCOPYABLE_H
-namespace wd 
+namespace wdf 
 {
 
 // 工具类
@@ -8,7 +8,7 @@ class Noncopyable
 {
 protected:
     // 防止直接实例化 Noncopyable（因为它本身没有实际功能，仅作为工具类）
-    // 允许派生类继承这些构造/析构函数，但阻止外部直接创建 Noncopyable 对象
+    // 允许派生类继承:这些构造/析构函数，但阻止外部直接创建 Noncopyable 对象
     Noncopyable() {}
     ~Noncopyable() {}
 
@@ -28,7 +28,7 @@ protected:
 //      - 显式尝试拷贝会报错
 //          - 任何拷贝行为（包括派生类的对象）都会触发编译错误，因为基类的拷贝操作已被删除
 
-} // end of namespace wd
+} // end of namespace wdf
 
 #endif // NONCOPYABLE_H
 

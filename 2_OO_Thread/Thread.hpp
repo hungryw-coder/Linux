@@ -1,10 +1,14 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include "Noncopyable.h"
+#include "Noncopyable.hpp"
 #include <pthread.h>
 
-namespace wd
+
+// 类定义前使用命名空间包裹的主要原因：
+//      - 避免命名冲突	通过 wd::Thread 区分其他库的同名类
+//      - 代码组织与模块化  将相关功能组织在 wdf 命名空间下
+namespace wdf
 {
 
 // 私有继承的特性
@@ -14,10 +18,13 @@ namespace wd
 //      - 派生类的派生类也无法访问基类的成员（继承链断裂）
 //
 // 在我的场景中：
-//      - Noncopyable 的构造函数和析构函数是 protected 的，私有继承后仍可在 Thread 内部访问；如果是 private 的，私有继承后不可在 Thread 内部访问
+//      - Noncopyable 的构造函数和析构函数是 protected 的，私有继承后仍可在 Thread 内部访问；如果是 private 继承的话，私有继承后不可在 Thread 内部访问
 //      - 因为 protected 成员对派生类可见，无论继承方式是 public、protected 还是 private
 //
 // 私有继承确保 Noncopyable 的细节对 Thread 的使用者不可见，符合封装原则
+
+// Q1：为什么派生类继承基类(删除了拷贝复制函数的基类)时，派生类无显示声明拷贝复制函数时，默认调用积累的拷贝复制函数，如果显示声明拷贝复制函数，则不调用基类的拷贝复制函数，在使用派生类对象时，用的是派生类的拷贝复制函数
+
 
 class Thread : Noncopyable // 等价于 class Thread : private Noncopyable
 {
@@ -49,8 +56,8 @@ private:
 
 
     // 继承了工具类 Noncopyable ，无需再手动禁用拷贝复制与赋值
-    // Thread( const Thread& ) = delete;
-    // Thread& operator=( const Thread& ) = delete;
+    // Thread( const Thread& );
+    // Thread& operator=( const Thread& );
 
 private:
     // 线程id
