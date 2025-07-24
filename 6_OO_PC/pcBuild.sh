@@ -19,7 +19,7 @@ g++ -std=c++11 -pthread \
     ../3_OO_Mutex/MutexLock.o \
     ../4_OO_Condition/Condition.o \
     ../5_OO_TaskQueue/TaskQueue.o \
-    -o ../6_OO_PC/pc_program
+    -o ../6_OO_PC/program
 
 # 删除所有 .o 文件
 rm -f \
@@ -28,4 +28,4 @@ rm -f \
     ../4_OO_Condition/Condition.o \
     ../5_OO_TaskQueue/TaskQueue.o
 
-echo "编译完成！可执行文件在 6_OO_PC/pc_program"
+echo "编译完成！可执行文件在 6_OO_PC/program"
