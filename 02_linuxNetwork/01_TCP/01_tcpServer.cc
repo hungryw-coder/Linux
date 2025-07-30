@@ -142,7 +142,7 @@ int main()
     //    2. 通常来说，监听套接字会一直存在，负责建立各个不同的TCP连接(只要源IP、源端口、目的IP、目的端口四元组任意一个 字段有区别，就是一个新的TCP连接)
     //       而某一条单独的TCP连接则是由其对应的已连接套接字进行数据通信的
     
-    char client_ip[INET_ADDRSTRLEN];                                                        // / INET_ADDRSTRLEN = 16（IPv4 最大长度）
+    char client_ip[INET_ADDRSTRLEN];                                                        //   INET_ADDRSTRLEN = 16（IPv4 最大长度）
     const char * ret_ptr =  inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));                // 将二进制网络字节序转化为十进制 IP
     if (ret_ptr != NULL) {
         cout << "客户端连接：" << client_ip << ":" << ntohs(client_addr.sin_port) << "\n";      // 将端口号由网络字节序（大端序）转为主机字节序（小端序）
@@ -154,7 +154,7 @@ int main()
     
     // ================================================================
     
-    // 服务端使用 Send 用于发送TCP数据
+    // 服务端使用 Send 用于发送TCP数据 -- 默认是阻塞的
     // ssize_t send(
     //     int sockfd,         // socket端点文件描述符
     //     const void *buf,    // 指向要发送数据的缓冲区的指针
