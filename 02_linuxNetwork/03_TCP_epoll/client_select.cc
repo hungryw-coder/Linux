@@ -27,7 +27,7 @@ int main()
     // Connect 服务端
     struct sockaddr_in client_addr;
     client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons(8080);
+    client_addr.sin_port = htons(8000);
     int ret = inet_pton(AF_INET, "127.0.0.1", &client_addr.sin_addr);
     if (ret != 1) {
         cerr << "IP地址转换失败\n";

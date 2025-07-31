@@ -1,0 +1,86 @@
+#include "TcpConnection.hpp"
+#include <iostream>
+#include <sstream>
+
+using std::cerr;
+using std::endl;
+
+namespace wdf
+{
+
+TcpConnection::TcpConnection(int fd)
+: m_sock()
+, m_sockIO(fd)
+, m_localAddr(getLocalAddress())
+, m_peerAddr(getPeerAddress())
+{
+        
+}
+
+InetAddress TcpConnection::getLocalAddress()
+{
+    // int getsockname(                         // 获取一个套接字（socket）的本地协议地址（IP地址和端口号）
+    //                int sockfd,               // 已绑定或已连接的套接字文件描述符
+    //                struct sockaddr *addr,    // 指向存放返回地址信息的缓冲区（通常为 struct sockaddr_in 或 struct sockaddr_in6）
+    //                socklen_t *addrlen        // 输入时为缓冲区 addr 的大小，输出时为实际地址结构的长度
+    //                );                        // 成功: 返回 0，且 addr 和 addrlen 被填充； 失败: 返回 -1
+
+    struct sockaddr_in addr;
+    memset(&addr, 0 , sizeof(addr));
+    socklen_t len = sizeof(addr);
+    int ret = getsockname(m_sock.fd(), (struct sockaddr *)&addr, &len);
+    if (ret < 0) {
+         cerr << "getsockname failed: " << strerror(errno) << endl;
+    }
+
+    return InetAddress(addr);
+}
+
+InetAddress TcpConnection::getPeerAddress()
+{
+    struct sockaddr_in addr;
+    memset(&addr, 0 , sizeof(addr));
+    socklen_t len = sizeof(addr);
+    int ret = getpeername(m_sock.fd(), (struct sockaddr *)&addr, &len);
+    if (ret < 0) {
+         cerr << "getpeername failed: " << strerror(errno) << endl;
+    }
+
+    return InetAddress(addr);
+}
+
+string TcpConnection::receive()
+{
+    char buff[65535] = {0};                             // 64 KB 栈缓冲区
+    int bytes_readline = m_sockIO.readline(buff, sizeof(buff));
+    return string(buff, bytes_readline);
+}
+
+void TcpConnection::send(const string & msg)            // const string& 避免拷贝
+{
+    if (msg.length() > 0) {                             // 调用 SocketIO::sendn 发送全部数据
+        m_sockIO.sendn(msg.c_str(), msg.length());      // string 类型的size()与lengthlength()函数是完全一样的，返回的是字符串的个数（不含\0）
+    }
+}
+
+bool TcpConnection::isClosed() const 
+{
+    char buf[20] = {0};
+    return m_sockIO.recvPeek(buf, sizeof(buf)) == 0;    // 通过 recvPeek 窥探数据（不移动读取指针）, 返回0则表示对端已关闭连接
+}
+
+void TcpConnection::shutdown()
+{
+    m_sock.shutdownWrite();                             // 调用 Socket::shutdownWrite 关闭写端（发送FIN包）,但保留读端 -- 半关闭
+}
+
+string TcpConnection::toString() const
+{                                                       // 调试信息
+    std::ostringstream oss;                             // 输出字符串流，允许像使用 std::cout 一样通过 << 操作符将多种类型的数据（如字符串、数字、地址等）拼接成一个字符串
+    oss << "tcp" << m_localAddr.ip() << ":" << m_localAddr.port()
+        << " has connected " 
+        << m_peerAddr.ip() << ":" << m_peerAddr.port();
+    return oss.str();                                   // 将流内容转换为 std::string 并返回
+}
+
+}

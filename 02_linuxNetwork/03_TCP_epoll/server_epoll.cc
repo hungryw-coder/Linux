@@ -25,6 +25,14 @@ int main()
         return -1;
     }
 
+    // int setsockopt(
+    //     int sockfd,          // 套接字文件描述符
+    //     int level,           // 选项的协议层: SOL_SOCKET	通用套接字选项（如 SO_REUSEADDR）; IPPROTO_IP	IPv4 选项（如 IP_TTL）; IPPROTO_TCP	TCP 选项（如 TCP_NODELAY）
+    //     int optname,         // 选项名: SO_REUSEADDR	允许重用本地地址（快速重启服务器）int (1/0); SO_REUSEPORT	允许多进程/线程绑定同一端口（Linux 3.9+）int (1/0)
+    //     const void *optval,  // 选项值: 指向选项值的指针，类型取决于 optname
+    //     socklen_t optlen     // 选项值的长度: 指定 optval 的字节长度（通常用 sizeof 计算）
+    // );                       // 成功：返回 0, 失败：返回 -1，并设置 errno
+
     // 避免地址被占用的问题
     int opt = 1;
     setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
@@ -33,7 +41,7 @@ int main()
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8080);
+    server_addr.sin_port = htons(8000);
     int ret = inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr);
     if (ret != 1) {
         cerr << "IP地址转换失败: " << strerror(errno) << endl;
