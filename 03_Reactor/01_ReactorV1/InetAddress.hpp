@@ -21,7 +21,7 @@ public:
 
     // 提供对 m_addr 的安全访问，避免外部手动解析 sockaddr_in
     string ip() const;
-    unsigned short port() const;
+    in_port_t port() const;
 
     // 供底层网络调用（如 bind()/connect()）直接使用
     const struct sockaddr_in * getAddrPtr() const { return &m_addr; }

@@ -6,7 +6,8 @@
 namespace wdf
 {
 
-// 利用 RAII 的特性管理套接字的资源 -- 构造函数中创建socket（::socket()），析构函数中自动关闭（::close()）-- 当Socket对象离开作用域时，会自动调用析构函数关闭文件描述符
+// 利用 RAII 的特性管理套接字的资源 -- 构造函数中创建socket（::socket()），析构函数中自动关闭（::close()）
+// 当Socket对象离开作用域时，会自动调用析构函数关闭文件描述符
 class Socket
 : Noncopyable               // 套接字是系统资源，一般情况下不能进行复制
 {

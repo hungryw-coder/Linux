@@ -23,7 +23,15 @@ private:
 
 private:
     InetAddress     m_addr;             // 封装服务器的 IP 地址和端口（如 "0.0.0.0:8080"），提供 sockaddr 格式的地址信息
-    Socket          m_lisetnSock;       // 管理 监听套接字（listenfd），RAII 方式自动关闭 fd
+    Socket          m_lisetnSock;       // 由于 Socket 继承自 Noncopyable，导致 Acceptor 也隐式成为不可拷贝的类
+                                        // Q1：为什么不应该允许拷贝？
+                                        // A1：核心问题：资源所有权
+                                        //      1. 文件描述符重复关闭：如果允许拷贝，多个 Acceptor 对象会持有同一个监听socket的fd，析构时会导致重复关闭
+                                        //      2. 监听端口冲突：拷贝后的多个 Acceptor 会尝试监听相同端口
+                                        //     网络编程最佳实践
+                                        //      1. 监听套接字应该具有唯一所有权
+                                        //      2. 符合RAII原则，避免资源管理混乱
+
 
 };
 
