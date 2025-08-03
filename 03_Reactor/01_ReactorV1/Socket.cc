@@ -20,7 +20,7 @@ namespace wdf
 
 Socket::Socket()
 {
-    cout << "Socket() -- ";
+    cout << "   Socket() -- ";
     m_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (m_fd < 0) {
         cerr << "Socket init failed: " << strerror(errno) << endl;
@@ -32,12 +32,12 @@ Socket::Socket()
 Socket::Socket(int fd) 
 : m_fd(fd)
 {
-    cout << "Socket(int) -- m_fd(fd) = " << m_fd << endl;
+    cout << "   Socket(int) -- m_fd(fd) = " << m_fd << endl;
 }
 
 Socket::~Socket()
 {
-    cout << "~Socket() -- ";
+    cout << "   ~Socket() -- ";
     close(m_fd);
     cout << "Socket m_fd = " << m_fd << " has closed." << endl;
 }
@@ -48,7 +48,7 @@ void Socket::shutdownWrite()
     // shutdown(m_fd, SHUT_WR);
     // cout << "Socket::shutdownWrite -- shutdown(m_fd, SHUT_WR)" << endl;
 
-    cout << "准备关闭写端，当前fd=" << m_fd << endl;
+    cout << "   准备关闭写端，当前fd=" << m_fd << endl;
     
     if (m_fd < 0) {
         cerr << "错误：尝试关闭无效的文件描述符" << endl;
@@ -60,7 +60,7 @@ void Socket::shutdownWrite()
         cerr << "shutdown调用失败: " << strerror(errno) 
              << " (fd=" << m_fd << ")" << endl;
     } else {
-        cout << "成功关闭写端 (fd=" << m_fd << ")" << endl;
+        cout << "   成功关闭写端 (fd=" << m_fd << ")" << endl;
     }
 }
 

@@ -92,7 +92,7 @@ int main()
                 break;
             }
         }
-
+        
         // 接收到服务端的数据
         // select 监视 client 时，当建立连接后，服务端先退出，会发送一个空数据给客户端, 客户端进入判断并退出
         if (FD_ISSET(clientfd, &readset)) {
@@ -116,6 +116,7 @@ int main()
         }
     }
 
+    cout << "client is exiting !" << endl;
     // 关闭连接
     close(clientfd);
 

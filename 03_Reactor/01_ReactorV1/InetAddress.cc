@@ -35,7 +35,7 @@ namespace wdf
 
 InetAddress::InetAddress(in_port_t port, const string & ip)
 {
-    cout << "InetAddress(in_port_t, const string &) -- ";
+    cout << "   InetAddress(in_port_t, const string &) -- ";
     memset(&m_addr, 0, sizeof(m_addr));
     m_addr.sin_family = AF_INET;
     m_addr.sin_port = htons(port);
@@ -43,35 +43,35 @@ InetAddress::InetAddress(in_port_t port, const string & ip)
     if (ret != 1) {
         cerr << "   inet_pton failed: " << strerror(errno) << endl;
     } else {
-        cout << "   port = "<< port << ", ip = " << ip << endl;
+        cout << "port = "<< port << ", ip = " << ip << endl;
     }
 }
 
 InetAddress::InetAddress(const struct sockaddr_in & addr)
 : m_addr(addr)
 {
-    cout << "InetAddress(const struct sockaddr_in &) -- over!"  << endl;
+    cout << "   InetAddress(const struct sockaddr_in &) -- over!"  << endl;
 }
 
 string InetAddress::ip() const 
 {   
-    cout << "InetAddress::ip -- ";
+    cout << "   InetAddress::ip -- ";
     char buf[INET_ADDRSTRLEN];
     const char * dest = inet_ntop(AF_INET, &m_addr.sin_addr, buf, sizeof(buf));
     if (dest == NULL) {
         cerr << "   inet_ntop() failed: " << strerror(errno) << endl;
         return nullptr;
     } else {
-        cout << "   ip = " << buf << endl;
+        cout << "ip = " << buf << endl;
         return buf;
     }
 }
 
 in_port_t InetAddress::port() const 
 {
-    cout << "InetAddress::port -- ";
+    cout << "   InetAddress::port -- ";
     in_port_t port = ntohs(m_addr.sin_port);
-    cout << "   port = " << port << endl;
+    cout << "port = " << port << endl;
     return port;
 }
 

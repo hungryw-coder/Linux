@@ -7,7 +7,7 @@
 namespace wdf
 {
 
-// Acceptor 时一个新链接的接收器， 监听的服务器
+// Acceptor -- 服务器TCP通信的相关配置      
 class Acceptor
 {
 public:
