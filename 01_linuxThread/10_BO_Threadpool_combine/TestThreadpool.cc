@@ -15,12 +15,13 @@ int main()
     threadpool.start();             // 启动线程池 -- 抽象类不能实例化，创建派生类对象向上转型成基类指针，存储进 vector
                                     //               再逐个启动线程
 
-    // doTask 的执行时机是 --- Threadpool::start --> Thread::start --> Thread::start_routine(private)  --> 动态多态 --> WorkerThread::run --> doTask  --> 动态多态 --> MyTask::process 
+    // doTask 的执行时机是 --- Threadpool::start --> doTask绑定给Thread::m_cb  --> Thread::start 
+    //                         --> Thread::start_routine(pthread->m_cb) 执行 doTask --> 从 TaskQueue 中取任务并执行(该任务是在main交给他的 MyTask::process )
+    // main 将 MyTask::process 绑定成任务放入TaskQueue
     
     // 存放任务
-    unique_ptr<Task> task(new MyTask);      // new MyTask 调用构造函数，在堆上申请空间返回指针托管给智能指针来托管资源
     for (int i = 0; i < 20; ++i) {
-        threadpool.addTask(task.get());     // task.get() 获取智能指针的模版类型的指针 -- Task * 
+        threadpool.addTask(std::bind(&MyTask::process, MyTask()));     // 将 MyTask::process 方法作为回调函数绑定成对象函数, 保存到任务队列
         printf("added tasks'numer is <<<  %d\n", i + 1);
     }
 

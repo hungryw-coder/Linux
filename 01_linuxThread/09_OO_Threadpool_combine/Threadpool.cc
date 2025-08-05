@@ -78,7 +78,7 @@ void Threadpool::addTask(Task * ptask) // 充当生产者角色
 void Threadpool::doTask() 
 {
     // 前提: vector<unique_ptr<Thread>> m_threads 中存储的都是工作线程 WorkerThread （其中 WorkerThread 向上转型为 Thread 放入 m_threads 中）
-    // doTask 的执行时机是 --- Threadpool::start --> Thread::start --> Thread::start_routine(private)  --> 动态多态 --> WorkerThread::run --> doTask
+    // doTask 的执行时机是 --- Threadpool::start --> Thread::start --> Thread::start_routine(private)  --> 动态多态 --> WorkerThread::run --> doTask --> 动态多态 --> Mytask::process
     
     // 消费者的具体实现在这里，WorkerThread 是消费者的代理，其通过多态来到这边的具体消费
     //      -  执行消费者自身的职责 -- 读取任务队列中的任务 并执行这个任务

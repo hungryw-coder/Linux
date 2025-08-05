@@ -1,47 +1,52 @@
 #include "Thread.hpp"
+
 #include <stdio.h>
 #include <string.h>
 
 namespace wdf
 {
 
-Thread::Thread()
-: _tid(0)
+Thread::Thread(ThreadCallback && cb)
+: m_pthid(0)
+, m_isRunning(false)
+, m_cb(std::move(cb))
 {
 
 }
 
 Thread::~Thread()
 {
-    
+
 }
 
-void Thread::start()
-{   
-    if (_tid == 0) {
-        int ret = pthread_create(&_tid, NULL, start_routine, this);
+void Thread::start() 
+{
+    if (!m_isRunning) {
+        int ret = pthread_create(&m_pthid, nullptr, start_routhine, this);
         if (ret != 0) {
-            fprintf(stderr, "pthread_create failed: %s\n", strerror(ret));
+            fprintf(stderr, "%s", strerror(ret));
         }
+        m_isRunning = true;
     }
 }
 
-void Thread::join()
+// 此函数为静态成员函数，没有 this 指针 --- 无法直接获取 Thread 对象 --- 但可以通过线程入口函数的参数来传递
+void * Thread::start_routhine(void * arg) 
 {
-    if (_tid != 0) {
-        pthread_join(_tid, nullptr);
-        _tid = 0;
-    }
-}
-
-void  * Thread::start_routine(void * arg)
-{
-    // 静态函数无法访问非静态成员（缺少this指针），其次静态成员的初始化需在类外定义
-    Thread * thread = static_cast<Thread *>(arg);
-    if (thread) {
-        thread->run();
-    }
+    // 线程入口函数内需要调用m_cb()方法 --- 线程将执行的任务 --- 所以需要this指针
+    Thread * pthread = static_cast<Thread *>(arg);
+    if (pthread) {
+        pthread->m_cb(); 
+    } 
     return nullptr;
 }
 
+void Thread::join() 
+{
+    if (m_isRunning) {
+        pthread_join(m_pthid, nullptr); // 等待子线程结束，再往下执行
+        m_isRunning = false;
+    }
 }
+
+} 

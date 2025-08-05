@@ -2,63 +2,53 @@
 #define MUTEXLOCK_HPP
 
 #include "Noncopyable.hpp"
+
 #include <pthread.h>
 
-namespace wdf
+namespace wdf 
 {
 
-class MutexLock
-: Noncopyable
+// 继承 wdf 中的工具类 -- Noncopyable，让 MutexLock 类隐式调用 Noncopyable 的拷贝复制函数(被删除，禁用了)；
+//      - 此时 MutexLock 在没有显式定义拷贝复制函数的情况下，会默认隐式调用父类中的拷贝复制函数，因为父类中删除了拷贝复制函数，故编译器报错
+//      - 如果 MutexLock 显式定义了拷贝复制函数，编译器则不会隐式调用父类中的拷贝复制函数，会调用显式定义的拷贝复制函数
+//
+// 这样操作原因是：互斥锁与条件变量是系统资源，不允许拷贝赋值
+class MutexLock : Noncopyable
 {
 public:
-    MutexLock()
-    {
-        pthread_mutex_init(&_mutex, nullptr);
-    }
+    // 构造函数，初始化一个互斥锁
+    MutexLock();
+    // 析构函数，销毁一个互斥锁
+    ~MutexLock();
 
-    ~MutexLock()
-    {
-        pthread_mutex_destroy(&_mutex);
-    }
-
-    void lock()
-    {
-        pthread_mutex_lock(&_mutex);
-    }
-
-    void unlock()
-    {
-        pthread_mutex_unlock(&_mutex);
-    }
+    // 加锁
+    void lock();
+    // 解锁
+    void unlock();
     
-    pthread_mutex_t * getMutexLockPtr()
-    {
-        return &_mutex;
-    }
+    // 获取底层 pthread_mutex_t*（供 Condition 类使用）
+    pthread_mutex_t * getMutexPtr() { return &m_mutex; }
 
 private:
-    pthread_mutex_t _mutex;
-
+    // 实际的 pthread 互斥锁
+    pthread_mutex_t m_mutex;
 };
 
-
-// 自动释放锁 -- RAII
-class MutexLockGuard
+class MutexLockGuard 
 {
 public:
-    MutexLockGuard(MutexLock & ml)
-    : _lock_guard(ml)
+    MutexLockGuard(MutexLock & m)
+    :m_mutex_guard(m)
     {
-        _lock_guard.lock();
+        m_mutex_guard.lock();
     }
 
     ~MutexLockGuard()
     {
-        _lock_guard.unlock();
+        m_mutex_guard.unlock();
     }
-        
 private:
-    MutexLock & _lock_guard;
+    MutexLock & m_mutex_guard;
 };
 
 }

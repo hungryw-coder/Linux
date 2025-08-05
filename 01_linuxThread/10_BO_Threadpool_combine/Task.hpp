@@ -1,16 +1,12 @@
 #ifndef TASK_HPP
 #define TASK_HPP
 
+#include <functional>
+
 namespace wdf
 {
 
-class Task
-{
-public:
-    virtual ~Task() {}
-
-    virtual void process() = 0;
-};
+using Task = std::function<void()>; // 基于对象
 
 }
 

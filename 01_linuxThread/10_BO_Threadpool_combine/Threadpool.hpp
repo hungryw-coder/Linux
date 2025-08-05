@@ -1,70 +1,39 @@
 #ifndef THREADPOOL_HPP
 #define THREADPOOL_HPP
 
-#include "Task.hpp"
 #include "Thread.hpp"
 #include "TaskQueue.hpp"
-#include "WorkThread.hpp"
-#include <vector>
-#include <memory>
+#include "Task.hpp"
 
-using std::vector;
+#include <memory>
+#include <vector>
+
 using std::unique_ptr;
-using wdf::Thread;
+using std::vector;
 
 namespace wdf
 {
 
 class Threadpool
 {
-    friend class WorkThread;
+    friend class WorkerThread;
 public:
-    Threadpool(size_t threadNum, size_t queSize)
-    : _threadNum(threadNum)
-    , _queSize(queSize)
-    , _taskQue(queSize)
-    , _threads()
-    , _isExit(false)
-    {
-        _threads.reserve(threadNum);
-    }
-
-    void start()
-    {
-        // 创建线程放入容器
-        if (!_isExit) { //防止重复开启线程池
-            for (int i = 0; i < _threadNum; ++i) {
-                // Thread 抽象类无法实例化，需要一个他的派生类 --- 创建工作线程
-                unique_ptr<Thread> workthread(new WorkThread(*this));
-                _threads.push_back(std::move(workthread));
-            }
-        }
-    }
-
-    void stop()
-    {
-
-    }
-
-    void addTask(Task * task)
-    {
-
-    }
+    Threadpool(size_t, size_t);         // 构造函数 -- 初始化线程与任务队列的容量
+    void start();                       // 开启线程池
+    void stop();                        // 关闭线程池
+    void addTask(Task && cb);           // 添加任务到任务队列 -- 参数函数对象, 需要配合右值引用来使用
 
 private:
-    void doTask()
-    {
-
-    }
+    void doTask();                      // 每个子线程都要做的事
 
 private:
-    size_t                      _threadNum;
-    size_t                      _queSize;
-    TaskQueue                   _taskQue;
-    vector<unique_ptr<Thread>>  _threads;
-    bool                        _isExit;
+    vector<unique_ptr<Thread>>  m_threads;      // 线程容器 -- Thread 是抽象基类，不能直接实例化，所以不能写成 vector<Thread>
+    size_t                      m_threadNum;    // 线程数
+    size_t                      m_queSize;      // 任务队列大小
+    TaskQueue                   m_taskQue;      // 任务队列
+    bool                        isExit;         // 线程池是否关闭
+
 };
-
 
 }
 
