@@ -79,7 +79,6 @@ int SocketIO::readline(char * buff, int maxlen)
     int total = 0;                  // 表示读取的总字节数
     
     while (remaining > 0) {
-        cout << "--" << endl;
         // 1. 窥探数据
         int peek_len  = recvPeek(p, remaining);         // 使用 recvPeek 窥探数据而不移除
         if (peek_len <= 0) {
@@ -140,7 +139,7 @@ int SocketIO::recvPeek(char * buff, int maxlen) const
 
     int ret = 0;
     do {
-        ret = recv(m_fd, buff, maxlen, MSG_PEEK );    // 从 _fd 套接字读取最多 maxlen 字节到 buff
+        ret = recv(m_fd, buff, maxlen, MSG_PEEK );                  // 从 _fd 套接字读取最多 maxlen 字节到 buff
                                                                     // MSG_PEEK：仅窥探数据，不会从缓冲区移除（后续 recv() 仍可读取相同数据）
                                                                     // Q1:当ret=0时，程序会卡在当前recv函数中，等待内核态的接收缓冲区有数据
                                                                     //      - 修改flags 为MSG_PEEK | MSG_DONTWAIT
@@ -152,7 +151,7 @@ int SocketIO::recvPeek(char * buff, int maxlen) const
         cout << "connection closed by peer" << endl;
     }
 
-    cout << "   recvPeek: peek " << ret << " bytes" << endl;
+    cout << "recvPeek: peek " << ret << " bytes" << endl;
     return ret;                                 // 返回实际窥探到的字节数（可能 < maxlen，取决于缓冲区数据量）
 }
 

@@ -24,7 +24,8 @@ class TcpConnection
 public:
     TcpConnection(int fd);          // 将对端的 fd 传入 Socket(int) 与 SocketIO(int), 并保存本地地址与对端地址
     
-    void setAllCallbacks(const TcpConnectionCallback & cb1,
+    // 三个回调的注册
+    void setAllCallbacks(const TcpConnectionCallback & cb1,     // 参数传递时，只能使用const引用来接受临时变量，否则会导致cb指向的变量为空（这里是移动赋值运算符导致的）
                          const TcpConnectionCallback & cb2,
                          const TcpConnectionCallback & cb3)
     {
@@ -42,6 +43,7 @@ public:
     void shutdown();                // 将对端写端关闭（不能发）, 读端依旧开启（还能收）
     string toString() const;        // 调试信息
     
+    // 三个回调的执行
     // 网络编程中，针对每个连接(Servre - Client)都会发生的三件事：
     // 1、当连接建立时
     // 2、当消息到达时(client -> server)

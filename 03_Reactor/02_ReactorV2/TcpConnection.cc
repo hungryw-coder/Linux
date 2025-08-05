@@ -23,7 +23,7 @@ string TcpConnection::receive()
     cout << "   TcpConnection::receive -- " << endl;
     char buff[1024] = {0};                             // 64 KB 栈缓冲区
     int bytes_readline = m_sockIO.readline(buff, sizeof(buff));
-    cout << "   -- readline: " << bytes_readline << "bytes " << endl;
+    cout << "   -- TcpConnection::receive readline: " << bytes_readline << "bytes " << endl;
     return string(buff, bytes_readline);
 }
 
@@ -33,14 +33,14 @@ void TcpConnection::send(const string & msg)            // const string& 避免�
     if (msg.length() > 0) {                             // 调用 SocketIO::sendn 发送全部数据
         m_sockIO.sendn(msg.c_str(), msg.length());      // string 类型的size()与lengthlength()函数是完全一样的，返回的是字符串的个数（不含\0）
     } 
-    cout << "   -- send over!" << endl;
+    cout << "   -- TcpConnection::send sendn over!" << endl;
 }
 
 bool TcpConnection::isClosed() const 
 {
     cout << "   TcpConnection::isClosed -- SocketIO::recvPeek == 0 ?" << endl;
     char buf[20] = {0};
-    return m_sockIO.recvPeek(buf, sizeof(buf)) == 0;    // 通过 recvPeek 窥探数据（不移动读取指针）, 返回0则表示对端已关闭连接
+    return m_sockIO.recvPeek(buf, sizeof(buf)) == 0;    // 通过 recvPeek 窥探对端数据（不移动读取指针）, 返回0则表示对端已关闭连接
 }
 
 void TcpConnection::shutdown()
@@ -55,8 +55,39 @@ string TcpConnection::toString() const
     std::ostringstream oss;                             // 输出字符串流，允许像使用 std::cout 一样通过 << 操作符将多种类型的数据（如字符串、数字、地址等）拼接成一个字符串
     oss << "[TCP] " << m_localAddr.ip() << ":" << m_localAddr.port()
         << " -> " 
-        << m_peerAddr.ip() << ":" << m_peerAddr.port();
+        << m_peerAddr.ip() << ":" << m_peerAddr.port() << endl;
     return oss.str();                                   // 将流内容转换为 std::string 并返回
+}
+
+void TcpConnection::handleNewConnectionCallback()
+{
+    cout << "   TcpConnection::handleNewConnectionCallback -- " << endl;
+    if (m_onConnection) {                       // 不为空，在 EventLoop::handleNewConnection 中已通过 setAllCallbacks 将他的成员数数据（回调函数）传到该类中，所以非空
+        m_onConnection(shared_from_this());     // 在成员函数内部正确获取本对象的 shared_ptr
+                                                // TcpConnection 继承 std::enable_shared_from_this, 在使用shared_from_this传入本类对象的智能指针
+        
+        // 在main函数将 onConnection 函数通过 EventLoop 中 setAllCallbacks 的移动语义赋值给 TcpConnection 对象
+        // main 函数中的 onConnection 函数通过回调在此处执行
+    }
+    cout << "   -- TcpConnection::handleNewConnectionCallback Over" << endl;
+}
+
+void TcpConnection::handleMessageCallback()
+{
+    cout << "   TcpConnection::handleMessageCallback -- " << endl;
+    if (m_onMessage) {
+        m_onMessage(shared_from_this());
+    }
+    cout << "   -- TcpConnection::handleMessageCallback Over" << endl;
+}
+
+void TcpConnection::handleCloseCallback()
+{
+    cout << "   TcpConnection::handleCloseCallback -- " << endl;
+    if (m_onClose) {
+        m_onClose(shared_from_this());
+    }
+    cout << "   -- TcpConnection::handleCloseCallback Over" << endl;
 }
 
 InetAddress TcpConnection::getLocalAddress()

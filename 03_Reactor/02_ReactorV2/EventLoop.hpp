@@ -27,11 +27,14 @@ public:
     ~EventLoop();
     void loop();                    // 事件循环的执行, 需要再用一个函数封装处理操作 (waitEpollFd)
     void unloop();                  // 退出事件循环
-
+    
+    // 为了给函数对象的数据成员赋值，整个 EventLoop 只是做中转，所以没有对回调执行
     void setAllCallbacks(const TcpConnectionCallback && cb1,
                          const TcpConnectionCallback && cb2,
                          const TcpConnectionCallback && cb3)
     {
+        // 注册三个事件 -- 起到桥梁作用， 目的是运用移动语义将三个函数传递给 TcpConnection 对象
+        // 传递时机 --- 在 handleNewConnection 中调用 TcpConnection 对象的 setAllCallbacks 函数将三个事件传递过去
         m_onConnection = std::move(cb1);
         m_onMessage = std::move(cb2);
         m_onClose = std::move(cb3);
