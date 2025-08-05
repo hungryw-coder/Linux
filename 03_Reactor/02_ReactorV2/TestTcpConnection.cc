@@ -36,7 +36,6 @@ int main()
     cout << "main >>> recv msg: " << msg <<  endl;
 
     con.send(msg);
-    cout << "main >>> send msg: " << msg << endl;
 
     return 0;
 }

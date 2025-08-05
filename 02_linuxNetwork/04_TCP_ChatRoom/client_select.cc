@@ -80,19 +80,20 @@ int main()
             
             read(STDIN_FILENO, buffer, sizeof(buffer)); // read 接收数据会包含'\n'
 
-            int bytes_sent = send(clientfd, buffer, strlen(buffer), 0); // strlen(buffer) - 1 不会发送'\n'
+            int bytes_sent = send(clientfd, buffer, strlen(buffer) - 1, 0); // strlen(buffer) - 1 不会发送'\n'
             if (bytes_sent == -1) {
                 cerr << "Send 失败\n";
                 break;
             }
-            cout << "[客户端] send: " "(" << bytes_sent << ")字节 " << buffer << endl;
+            buffer[bytes_sent] = '\0';
+            cout << "[客户端] send: " << buffer << "(" << bytes_sent << "字节)" << endl;
 
             // 客户端退出条件
             if (strcmp(buffer, "exit") == 0) {
                 break;
             }
         }
-        
+
         // 接收到服务端的数据
         // select 监视 client 时，当建立连接后，服务端先退出，会发送一个空数据给客户端, 客户端进入判断并退出
         if (FD_ISSET(clientfd, &readset)) {
@@ -106,6 +107,8 @@ int main()
                 cerr << "服务器关闭连接\n";
                 break;
             } 
+
+            buffer[bytes_recevied] = '\0';
             cout << "Recv 成功, [服务端]：" << buffer << endl;
             
             // 查看服务端是否要求退出
@@ -116,7 +119,6 @@ int main()
         }
     }
 
-    cout << "client is exiting !" << endl;
     // 关闭连接
     close(clientfd);
 

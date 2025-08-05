@@ -41,7 +41,7 @@ int main()
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8000);
+    server_addr.sin_port = htons(8080);
     int ret = inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr);
     if (ret != 1) {
         cerr << "IP地址转换失败: " << strerror(errno) << endl;
@@ -148,7 +148,8 @@ int main()
     //      - 若链表为空，根据 timeout 阻塞或超时返回
     
     cout << "开始进入epoll监听\n";
-    struct epoll_event eventsArr[MAX_EVENT_SIZE] = {};                              // 所有元素默认初始化为 0, 符合现代 C++ 风格
+    struct epoll_event eventsArr[MAX_EVENT_SIZE] = {};  // 这里 eventsArr 在内存中是一段连续的数组，每个元素是一个 epoll_event 结构体
+                                                        // 用于存储 epoll 返回的就绪事件
     while (true) {
         int nready = epoll_wait(epfd, eventsArr, MAX_EVENT_SIZE, EPOLL_TIMEOUT);
         if (nready == -1 && EINTR == errno) {
@@ -166,107 +167,106 @@ int main()
             cout << "timeout 且无事件就绪\n";
         } else {
             cout << "就绪事件数 nready = " << nready << endl;
-        } 
         
-        // nready > 0 时，悠文件描述符就绪
-        for (int i = 0; i < nready; ++i) {
-            // 遍历数组获取就绪的文件描述符
-            int fd = eventsArr[i].data.fd;
-            cout << "fd = " << fd << endl;
-            
-            // 判断新连接 -- if (fd == server_fd)
-            // 这个判断成立的原因：
-            //      - 1. 当前只对 server_fd 注册了 EPOLLIN 事件, 这个事件只会在监听套接字上有新连接到达时触发
-            //      - 2. 监听套接字 (server_fd) 的唯一作用就是接受新连接, 当客户端调用 connect() 时，监听套接字就会变为"可读"状态
-            //      - 3. epoll_wait() 返回的就绪事件数组中, 只有监听套接字会触发"有新连接"的事件, 普通客户端套接字触发的是"有数据可读"的事件
-            
-            // Q1: 普通套接字也能触发 "新连接" 事件？
-            // 🙅 错误的！
-            //      1. >>> 只有 listen() 过的套接字才会触发 EPOLLIN 作为 "新连接" 事件 <<< 
-            //      2. 普通套接字的 EPOLLIN 仅表示 "数据可读"
-            //
-            // Q2: accept() 会阻塞？
-            //      1. 在 非阻塞模式 + epoll 下，accept() 只有在 ACCEPT 队列非空时才会被调用，因此不会阻塞
-            //      2. 如果 epoll_wait() 返回监听套接字的 EPOLLIN，则 accept() 一定能立即返回
-            //  Q2解析：
-            //      1. 默认情况：accept() 的阻塞行为 --- 如果 ACCEPT 队列（全连接队列--完成三次握手）为空（没有新连接），accept() 会一直阻塞，直到有新连接到来
-            //      2. 非阻塞模式下的 accept() --- 通过 fcntl 设置监听套接字为非阻塞：fcntl(server_fd, F_SETFL, O_NONBLOCK);  
-            //          - 如果 ACCEPT 队列为空，accept() 会立即返回 -1，并设置 errno = EAGAIN 或 EWOULDBLOCK表示无连接
-            //          - 必须配合 I/O 多路复用（如 epoll） 才能高效工作 --- 只在 ACCEPT 队列非空时调用，不会阻塞
+            // nready > 0 时，悠文件描述符就绪
+            for (int i = 0; i < nready; ++i) {
+                // 遍历数组获取就绪的文件描述符
+                int fd = eventsArr[i].data.fd;
+                cout << "epoll_event current fd = " << fd << endl;
+                
+                // 判断新连接 -- if (fd == server_fd)
+                // 这个判断成立的原因：
+                //      - 1. 当前只对 server_fd 注册了 EPOLLIN 事件, 这个事件只会在监听套接字上有新连接到达时触发
+                //      - 2. 监听套接字 (server_fd) 的唯一作用就是接受新连接, 当客户端调用 connect() 时，监听套接字就会变为"可读"状态
+                //      - 3. epoll_wait() 返回的就绪事件数组中, 只有监听套接字会触发"有新连接"的事件, 普通客户端套接字触发的是"有数据可读"的事件
+                
+                // Q1: 普通套接字也能触发 "新连接" 事件？
+                // 🙅 错误的！
+                //      1. >>> 只有 listen() 过的套接字才会触发 EPOLLIN 作为 "新连接" 事件 <<< 
+                //      2. 普通套接字的 EPOLLIN 仅表示 "数据可读"
+                //
+                // Q2: accept() 会阻塞？
+                //      1. 在 非阻塞模式 + epoll 下，accept() 只有在 ACCEPT 队列非空时才会被调用，因此不会阻塞
+                //      2. 如果 epoll_wait() 返回监听套接字的 EPOLLIN，则 accept() 一定能立即返回
+                //  Q2解析：
+                //      1. 默认情况：accept() 的阻塞行为 --- 如果 ACCEPT 队列（全连接队列--完成三次握手）为空（没有新连接），accept() 会一直阻塞，直到有新连接到来
+                //      2. 非阻塞模式下的 accept() --- 通过 fcntl 设置监听套接字为非阻塞：fcntl(server_fd, F_SETFL, O_NONBLOCK);  
+                //          - 如果 ACCEPT 队列为空，accept() 会立即返回 -1，并设置 errno = EAGAIN 或 EWOULDBLOCK表示无连接
+                //          - 必须配合 I/O 多路复用（如 epoll） 才能高效工作 --- 只在 ACCEPT 队列非空时调用，不会阻塞
 
-            // 处理新链接
-            if (fd == server_fd) {  // fd = server_fd = 3  只有监听套接字会触发 "新连接" 事件
-                
-                struct sockaddr_in client_addr;
-                socklen_t len = sizeof(client_addr);
-                int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &len); // 将 client_fd 加入 epoll 监听（关注 EPOLLIN 数据可读）
-                if (client_fd < 0) {
-                    cerr << "ACcept 失败: " << strerror(errno) << endl;
-                    continue;
-                }
-            
-                // 新连接信息打印
-                char client_ip[INET_ADDRSTRLEN];
-                const char * convert_ptr = inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
-                if (convert_ptr != NULL) {  
-                    cout << "新的客户端连接: " << client_fd << "  " << client_ip << ":" << ntohs(client_addr.sin_port) << "  has connected"<< endl;
-                } else {
-                    cerr << "inet_ntop 转换失败: " << strerror(errno) << endl;
-                    continue;
-                }
-                
-                // epoll 对 client_fd 进行读事件监听
-                ev.data.fd = client_fd;
-                ev.events = EPOLLIN;                                    // 对 client_fd 上的读事件进行监听
-                ret = epoll_ctl(epfd, EPOLL_CTL_ADD, client_fd, &ev);
-                if (ret == -1) {
-                    cerr << "Failed to add client fd: " << strerror(errno) << endl;
-                    close(client_fd);
-                    continue;
-                }
-                cout << "添加 client_fd = " << client_fd  << " 到 epoll 监听" << endl;
-                       
-            } else {
-                // 普通套接字触发的是 "数据可读" 事件
-                
-                // client_fd 已建立好的连接上有读事件就绪
-                char buffer[1024] = {};
-                
-                // 接收数据 
-                int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
-                if (bytes_received == 0) {
-                    // 连接断开 -- 从 epoll 监听的红黑树上删除该文件描述符
-                    ev.data.fd = fd;
-                    ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
-                    if (ret == -1) {
-                        cerr << "epoll_ctl 失败: " << strerror(errno) << endl;
+                // 处理新链接
+                if (fd == server_fd) {  // fd = server_fd = 3  只有监听套接字会触发 "新连接" 事件
+                    
+                    struct sockaddr_in client_addr;
+                    socklen_t len = sizeof(client_addr);
+                    int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &len); // 将 client_fd 加入 epoll 监听（关注 EPOLLIN 数据可读）
+                    if (client_fd < 0) {
+                        cerr << "ACcept 失败: " << strerror(errno) << endl;
                         continue;
                     }
-                    cout << "删除 就绪数组中已断开连接的 fd \n";
-                    close(fd);
-                    continue;
-                } else if (bytes_received == -1) {
-                    cerr << "recv 失败: " << strerror(errno) << endl;
-                    continue;
-                }
+                
+                    // 新连接信息打印
+                    char client_ip[INET_ADDRSTRLEN];
+                    const char * convert_ptr = inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
+                    if (convert_ptr != NULL) {  
+                        cout << "新的客户端连接: " << client_fd << "  " << client_ip << ":" << ntohs(client_addr.sin_port) << "  has connected"<< endl;
+                    } else {
+                        cerr << "inet_ntop 转换失败: " << strerror(errno) << endl;
+                        continue;
+                    }
+                    
+                    // epoll 对 client_fd 进行读事件监听
+                    ev.data.fd = client_fd;
+                    ev.events = EPOLLIN;                                    // 对 client_fd 上的读事件进行监听
+                    ret = epoll_ctl(epfd, EPOLL_CTL_ADD, client_fd, &ev);
+                    if (ret == -1) {
+                        cerr << "Failed to add client fd: " << strerror(errno) << endl;
+                        close(client_fd);
+                        continue;
+                    }
+                    cout << "添加 client_fd = " << client_fd  << " 到 epoll 监听" << endl;
+                           
+                } else {
+                    // 处理已连接的 Socket
+                    // 普通套接字触发的是 "数据可读" 事件
+                    
+                    // client_fd 已建立好的连接上有读事件就绪
+                    char buffer[1024] = {};
+                    
+                    // 接收数据 
+                    int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
+                    if (bytes_received == 0) {
+                        // 连接断开 -- 从 epoll 监听的红黑树上删除该文件描述符
+                        ev.data.fd = fd;
+                        ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
+                        if (ret == -1) {
+                            cerr << "epoll_ctl 失败: " << strerror(errno) << endl;
+                            continue;
+                        }
+                        cout << "删除 就绪数组中已断开连接的 fd \n";
+                        close(fd);
+                        continue;
+                    } else if (bytes_received == -1) {
+                        cerr << "recv 失败: " << strerror(errno) << endl;
+                        continue;
+                    }
 
-                // 数据接收成功
-                cout << "[Server] recv: " << buffer << "(" << bytes_received << "字节)" << endl; 
+                    // 数据接收成功
+                    cout << "[Server] recv: " << buffer << "(" << bytes_received << "字节)" << endl; 
 
-                // 服务器回复客户端信息
-                cout << "[Server] reply: ";
-                string reply;
-                getline(cin, reply);
-                int bytes_sent = send(fd, reply.c_str(), reply.length(), 0);
-                if (bytes_sent < 0) {
-                    cerr << "Send 失败: " << strerror(errno) << endl;
-                    continue;
-                }
-                cout << "[Server] send: " << bytes_sent << "字节\n";
-            }
-
-        } // for1
-
+                    // 服务器回复客户端信息
+                    cout << "[Server] reply: ";
+                    string reply;
+                    getline(cin, reply);
+                    int bytes_sent = send(fd, reply.c_str(), reply.length(), 0);
+                    if (bytes_sent < 0) {
+                        cerr << "Send 失败: " << strerror(errno) << endl;
+                        continue;
+                    }
+                    cout << "[Server] send: " << bytes_sent << "字节\n";
+                } // else
+            } // for
+        } // else 
     }// while(1)
 
 
