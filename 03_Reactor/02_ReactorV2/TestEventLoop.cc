@@ -11,7 +11,7 @@ using wdf::TcpConnectionPtr;
 
 void onConnection(TcpConnectionPtr conn)
 {
-    cout << "\n[Main] >>>> " << conn->toString() << endl << endl;
+    cout << "\n[Main] >>>> " << conn->toString()  <<  " had connected! " << endl << endl;
 }
     
 void onMessage(TcpConnectionPtr conn) 
@@ -32,7 +32,7 @@ void onMessage(TcpConnectionPtr conn)
 
 void onClose(TcpConnectionPtr conn) 
 {
-    cout << "\n[Main] >>>> " <<  conn->toString() << endl;
+    cout << "\n[Main] >>>> " <<  conn->toString() << " had closed!"<< endl;
 }
 
 
