@@ -1,6 +1,8 @@
 #ifndef EVENTLOOP_HPP
 #define EVENTLOOP_HPP
 
+#include "MutexLock.hpp"
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -16,6 +18,7 @@ namespace wdf
 class TcpConnection;
 using TcpConnectionPtr = shared_ptr<TcpConnection>;
 using TcpConnectionCallback = function<void(TcpConnectionPtr)>;
+using Functor = function<void()>;
 
 class Acceptor;             // 向前声明，实现类中引用头文件
 
@@ -39,6 +42,9 @@ public:
         m_onMessage = std::move(cb2);
         m_onClose = std::move(cb3);
     }
+
+    void runInLoop(Functor && cb);  // 存放"任务"(该任务是一个函数对象，可以是 TcpConnection::send 方法)到vector 中，并且唤醒(修改 m_evtfd 内核计数器的值)
+
 private:
     void waitEpollFd();             // 1.针对新连接的处理，设计 handleNewConnection 函数； 
                                     // 2.针对已创建好的连接(fd)进行处理，设计handleMessage函数
@@ -52,6 +58,11 @@ private:
     int createEpollFd();            // 创建 epoll 的文件描述符
     void addEpollReadEvent(int);    // 增加Epoll中的读事件
     void delEpollReadEvent(int);    // 删除Epoll中的读事件
+    
+    int createEventFd();            // 创建 通知的文件描述符
+    void handleReadEvent();         // 修改 m_evfd 内核计数器的值（清零）
+    void wakeup();                  // 修改 m_evfd 内核计数器的值+1, 唤醒子线程
+    void doPendingFunctors();       // 执行"任务"（是一个函数对象，可以是 TcpConnection::send 方法）， 将数据发送给客户端
 
 private:
     int                        m_epfd;          // epoll 文件描述符，创建成功后，内核会分配一个包含红黑树与就绪链表的结构体
@@ -64,6 +75,10 @@ private:
     TcpConnectionCallback      m_onConnection;  // 新连接建立时的回调
     TcpConnectionCallback      m_onMessage;     // 收到消息时的回调
     TcpConnectionCallback      m_onClose;       // 连接关闭时的回调
+
+    int                        m_evtfd;         // 用于通知的文件描述符
+    MutexLock                  m_mutex;         // 互斥锁, 计算线程有多个， IO线程只有一个， m_pendings只有一个，多个线程需要修改 m_pendings，所以要加锁
+    vector<Functor>            m_pendings;      // 存放"任务"的容器 -- 存放的是函数对象
 };
 
 }

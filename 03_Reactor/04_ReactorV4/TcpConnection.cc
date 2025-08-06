@@ -1,4 +1,5 @@
 #include "TcpConnection.hpp"
+#include "EventLoop.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -9,11 +10,12 @@ using std::endl;
 namespace wdf
 {
 
-TcpConnection::TcpConnection(int fd)
+TcpConnection::TcpConnection(int fd, EventLoop * loop)
 : m_sock(fd)                            // 将对端fd传入, 构建套接字对象, 服务端套接字在Acceptor中进行创建
 , m_sockIO(fd)                          // 将对端fd传入, 进行TCP通信
 , m_localAddr(getLocalAddress())        // 调用的是 InetAddress::InetAddress(const struct sockaddr_in &) 保存了本地地址协议
 , m_peerAddr(getPeerAddress())          // 同理, 保存了对端协议地址, 由 m_peerAddr 保存，m_peerAddr -> InetAddress <- getPeerAddress()
+, m_loop(loop)                          // 将 EventLoop 指针传进来 -- 通过 EventLoop::handleNewConnection 
 {
     cout << "   TcpConnection(int) -- over!" << endl;
 }
@@ -92,6 +94,17 @@ void TcpConnection::handleCloseCallback()
         m_onClose(shared_from_this());
     }
     cout << "   -- TcpConnection::handleCloseCallback Over" << endl;
+}
+
+void TcpConnection::sendInLoop(const string & msg)
+{
+    // 该函数中要将消息的发送打包成一个函数对象，注册给IO线程中的EventLoop对象，并且通知IO线程发送数据
+    // 即 EventLoop::runInLoop 方法来执行该操作
+    cout << "   TcpConnection::sendInLoop -- " << endl;
+    if (m_loop) {
+        m_loop->runInLoop(std::bind(&TcpConnection::send, this, msg));
+    }
+    cout << "   -- TcpConnection::sendInLoop Over" << endl;
 }
 
 InetAddress TcpConnection::getLocalAddress()

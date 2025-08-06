@@ -13,6 +13,7 @@ using std::function;
 
 namespace wdf
 {
+class EventLoop;
 
 class TcpConnection;
 using TcpConnectionPtr = shared_ptr<TcpConnection>;
@@ -22,7 +23,8 @@ class TcpConnection
 : public std::enable_shared_from_this<TcpConnection>        // 辅助类：为了在成员函数内部函数中通过 this 字节获取本对象的智能指针 shared_ptr 
 {
 public:
-    TcpConnection(int fd);          // 将对端的 fd 传入 Socket(int) 与 SocketIO(int), 并保存本地地址与对端地址
+    TcpConnection(int fd, EventLoop * loop);                // 将对端的 fd 传入 Socket(int) 与 SocketIO(int), 并保存本地地址与对端地址
+                                                            // 初始化 EventLoop 的指针，为成员数据赋值
     
     // 三个回调的注册
     void setAllCallbacks(const TcpConnectionCallback & cb1,     // 参数传递时，只能使用const引用来接受临时变量，否则会导致cb指向的变量为空（这里是移动赋值运算符导致的）
@@ -53,6 +55,8 @@ public:
     void handleMessageCallback();
     void handleCloseCallback();
 
+    void sendInLoop(const string & msg);    // 线程池使用 TcpConnection 的对象发送数据给 EventLoop
+
 private:
     InetAddress getLocalAddress();  // 获取本地（服务端）地址信息 sockaddr_in 
     InetAddress getPeerAddress();   // 获取对端（客户端）地址信息 sockaddr_in
@@ -66,6 +70,9 @@ private:
     TcpConnectionCallback m_onConnection;
     TcpConnectionCallback m_onMessage;
     TcpConnectionCallback m_onClose;
+
+    EventLoop * m_loop;     // 知道 EventLoop 的存在 -- 
+    
 };
 
 }
