@@ -158,7 +158,7 @@ int EventLoop::createEpollFd()
     if (epfd < 0) {
         cerr << "epoll_create1 失败: " << strerror(errno) << endl;
     }
-    cout << "epoll_create1 Over" << endl;
+    cout << "epoll_create1 Over, evfd = "<< m_epfd << endl;
     return epfd;
 }
 
