@@ -63,6 +63,49 @@ bool Configuration::loadConfig(const string & filename)
     return true;
 }
 
+string Configuration::getValue(const string & key, const string & defaultvalue) const 
+{
+    auto it = m_map.find(key);
+    if (it != m_map.end()) {
+        return it->second;
+    }
+    
+    cerr << "Warning: Config key not found: " << key << ", using default value: " << defaultvalue << endl;
+    return defaultvalue;
+}
+
+int Configuration::getIntValue(const string & key, int defaultValue) const
+{
+    auto it = m_map.find(key);
+    if (it != m_map.end()) {
+        try {
+            return std::stoi(it->second);       // std::stoi：将字符串转换为整数
+                                                // 可能会抛出异常：
+                                                //      invalid_argument：非数字字符串（如 "abc"）
+                                                //      out_of_range：数值超过 int 范围（如 "999999999999"）
+        } catch (const std::exception & e) {
+            cerr << "Error: Invaild integer value for key "  << key
+                 << ": " << it->second << ", using default: " << defaultValue
+                 << " (" << e.what() << ")" << endl;    // 错误类型（通过 e.what() 获取）
+            return defaultValue;
+        }
+    }
+    cerr << "Warning: Config key not found: " << key << ", using default value: " << defaultValue << endl;
+    return defaultValue;
+}
+
+bool Configuration::hasKey(const string & key) const
+{
+    return m_map.find(key) != m_map.end();
+}
+
+void Configuration::printAll() const
+{
+    for (const auto & pair : m_map) {
+        cout << pair.first << " = " << pair.second << endl;
+    }
+}
+
 void Configuration::trim(string & str)
 {
     // 去除左侧空白

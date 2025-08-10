@@ -28,7 +28,7 @@ public:
     // 获取配置值（默认值版）
     string getValue(const string & key, const string & defaultValue = "") const;
 
-    // 获取整数配置值
+    // 获取字符串配置值转换成整数配置值
     int getIntValue(const string & key, int defaultvalue = 0) const;
     
     // 是否有配置值
