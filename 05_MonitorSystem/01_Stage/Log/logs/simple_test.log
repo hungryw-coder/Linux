@@ -1,0 +1,18 @@
+[2025-08-11 17:53:39.470] [19450] [info] Logger initialized successfully. Mode: Sync
+[2025-08-11 17:53:39.470] [19450] [info] [USER_REG] User 'alice' registered successfully from IP 192.168.1.101
+[2025-08-11 17:53:39.470] [19450] [info] [USER_LOGIN] User 'bob' logged in from IP 192.168.1.102
+[2025-08-11 17:53:39.470] [19450] [info] [CAMERA_ACCESS] User 'admin' 查看监控画面 camera ID 1
+[2025-08-11 17:53:39.470] [19450] [info] [CAMERA_EVENT] Camera 2 - motion: 检测到移动物体
+[2025-08-11 17:53:39.470] [19450] [warning] [SYSTEM_CRITICAL] Database - 连接失败
+[2025-08-11 18:03:52.472] [19609] [info] Logger initialized successfully. Mode: Sync
+[2025-08-11 18:03:52.472] [19609] [info] [USER_REG] User 'alice' registered successfully from IP 192.168.1.101
+[2025-08-11 18:03:52.472] [19609] [info] [USER_LOGIN] User 'bob' logged in from IP 192.168.1.102
+[2025-08-11 18:03:52.472] [19609] [info] [CAMERA_ACCESS] User 'admin' 查看监控画面 camera ID 1
+[2025-08-11 18:03:52.473] [19609] [info] [CAMERA_EVENT] Camera 2 - motion: 检测到移动物体
+[2025-08-11 18:03:52.473] [19609] [warning] [SYSTEM_CRITICAL] Database - 连接失败
+[2025-08-11 18:05:04.298] [19640] [info] Logger initialized successfully. Mode: Sync
+[2025-08-11 18:05:04.298] [19640] [info] [USER_REG] User 'alice' registered successfully from IP 192.168.1.101
+[2025-08-11 18:05:04.298] [19640] [info] [USER_LOGIN] User 'bob' logged in from IP 192.168.1.102
+[2025-08-11 18:05:04.298] [19640] [info] [CAMERA_ACCESS] User 'admin' 查看监控画面 camera ID 1
+[2025-08-11 18:05:04.298] [19640] [info] [CAMERA_EVENT] Camera 2 - motion: 检测到移动物体
+[2025-08-11 18:05:04.298] [19640] [warning] [SYSTEM_CRITICAL] Database - 连接失败
