@@ -29,12 +29,10 @@ EventLoop::EventLoop(Acceptor & acceptor)
 
 EventLoop::~EventLoop()
 {
-    cout << "   ~EventLoop -- ";
-    
     close(m_evtfd);
     close(m_epfd);
     
-    cout << "close(m_epfd) over" << endl;
+    cout << "   ~EventLoop -- close(m_epfd) over" << endl;
 }
 
 void EventLoop::loop()
@@ -52,16 +50,14 @@ void EventLoop::loop()
 
 void EventLoop::unloop()
 {
-    cout << "   EventLoop::unloop -- ";
-    
     m_isLooping = false;    // 要与loop函数运行在不同的线程
     
-    cout << "m_isLooping = false" << endl;
+    cout << "   EventLoop::unloop -- m_isLooping = false" << endl;
 }
 
 void EventLoop::runInLoop(Functor && cb)    // cb: TcpConnection的send方法 的函数对象
 {
-    // 将任务(TcpConnection::send)添加到队列并唤事件循环
+    // 将任务(TcpConnection::send)添加到m_pendings中并唤事件循环
     cout << "   EventLoop::runInLoop -- " << endl;
 
     // 临界区开始
@@ -96,7 +92,7 @@ void EventLoop::waitEpollFd()
         cout << "   epoll timeout" << endl;
     } else {
         // 有就绪事件
-        cout << "   nready = " << nready << endl;
+        cout << "   有事件被监听到 nready = " << nready << endl;
         // 处理就绪事件
         for (int i = 0; i < nready; ++i) {
             int fd = m_evtArr[i].data.fd;   // 保存着服务端监听套接字、客户端普通套接字、事件文件描述符
@@ -105,7 +101,9 @@ void EventLoop::waitEpollFd()
                 handleNewConnection();      // 在这其中将client加入epoll中监听
                 cout << "   -- waitEpollFd handleNewConnection Over" << endl;
             } else if (fd == m_evtfd) {
-                // 构造函数中addEpollReadEvent(m_evtfd)之后，m_evtArr 中已经存了事件文件描述符，当wakeup后，eventfd会触发读事件，使得 fd == m_evfd  TODO
+                // 构造函数中addEpollReadEvent(m_evtfd)之后，m_evtArr 中已经存了事件文件描述符
+                // 当wakeup后(即runInLoop后（不仅保存了sendInLoop发来的函数对象--任务，还wakeup通知了此处)
+                // 使得eventfd会触发读事件，进而 fd == m_evfd  
                 handleReadEvent();      // 处理内核计数器 -- 清零
                 doPendingFunctors();    // 获取 m_pendings 中的'任务'并执行
                 cout << "   -- waitEpollFd handleReadEvent and doPendingFunctors Over" << endl;
@@ -153,18 +151,16 @@ void EventLoop::handleMessage(int fd)
 
 int EventLoop::createEpollFd() 
 {
-    cout << "   EventLoop::createEpollFd -- ";
     int epfd = epoll_create1(0);
     if (epfd < 0) {
         cerr << "epoll_create1 失败: " << strerror(errno) << endl;
     }
-    cout << "epoll_create1 Over, evfd = "<< m_epfd << endl;
+    cout << "   EventLoop::createEpollFd -- epoll_create1 Over, m_epfd = "<< epfd << endl;
     return epfd;
 }
 
 void EventLoop::addEpollReadEvent(int fd) 
 {
-    cout << "   EventLoop::addEpollReadEvent -- ";
     struct epoll_event ev;
     memset(&ev, 0, sizeof(ev));
     ev.data.fd = fd;
@@ -173,12 +169,11 @@ void EventLoop::addEpollReadEvent(int fd)
     if (ret == -1){
         cerr << "epoll_ctl add 失败: " << strerror(errno) << endl;
     }
-    cout << "epoll_ctl-ADD Over" << endl;
+    cout << "   EventLoop::addEpollReadEvent -- epoll_ctl-ADD Over" << endl;
 }
 
 void EventLoop::delEpollReadEvent(int fd)
 {
-    cout << "   EventLoop::delEpollReadEvent -- ";
     struct epoll_event ev;
     memset(&ev, 0, sizeof(ev));
     ev.data.fd = fd;
@@ -187,42 +182,39 @@ void EventLoop::delEpollReadEvent(int fd)
     if (ret == -1){
         cerr << "epoll_ctl del 失败: " << strerror(errno) << endl;
     }
-    cout << "epoll_ctl-DEL Over" << endl;
+    cout << "   EventLoop::delEpollReadEvent -- epoll_ctl-DEL Over" << endl;
 }
 
 int EventLoop::createEventFd()
 {
-    cout << "   EventLoop::createEventFd -- " << endl;
     int fd = eventfd(0, 0); // 阻塞模式，他通过一个内核维护的64位计数器实现事件通知机制，初始计数器=0
     if (fd == -1) {
         cerr << "eventfd 失败: " << strerror(errno) << endl;
     }
-    cout << "   -- 创建一个事件通知文件描述符，用于IPC, m_evfd = " << fd << endl;
+    cout << "   EventLoop::createEventFd -- 创建一个事件通知文件描述符，用于IPC, m_evfd = " << fd << endl;
     return fd;
 }
 
 void EventLoop::handleReadEvent()
 {
     // 处理内核计数器的值(清零)
-    cout << "   EventLoop::handleReadEvent -- " << endl;
     uint64_t howmany = 0;
     int bytes_read = read(m_evtfd, &howmany, sizeof(howmany));
     if (bytes_read != sizeof(howmany)) {
         cerr << "read 失败: " << strerror(errno) << endl;
     }
-    cout << "   -- 将内核计数器的值清零" << endl;
+    cout << "   EventLoop::handleReadEvent -- 将内核计数器的值清零" << endl;
 
 }
 
 void EventLoop::wakeup()
 {
-    cout << "   EventLoop::wakeup -- " << endl;
     uint64_t one = 1;
     int bytes_write = write(m_evtfd, &one, sizeof(one));
     if (bytes_write != sizeof(one)) {
         cerr << "write 失败: " << strerror(errno) << endl;
     }
-    cout << "   -- 向内核计数器写值1，唤醒子线程" << endl;
+    cout << "   EventLoop::wakeup -- 向内核计数器写值1，唤醒子线程, wakeup Over" << endl;
 }
 
 void EventLoop::doPendingFunctors()
@@ -241,7 +233,7 @@ void EventLoop::doPendingFunctors()
     for (auto & func : tmp) {
         func();
     }
-    cout <<  "  -- EventLoop::doPendingFunctors Over!" << endl;
+    cout <<  "   -- EventLoop::doPendingFunctors Over!" << endl;
 }
 
 }

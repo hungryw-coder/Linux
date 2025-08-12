@@ -15,9 +15,10 @@ TcpConnection::TcpConnection(int fd, EventLoop * loop)
 , m_sockIO(fd)                          // 将对端fd传入, 进行TCP通信
 , m_localAddr(getLocalAddress())        // 调用的是 InetAddress::InetAddress(const struct sockaddr_in &) 保存了本地地址协议
 , m_peerAddr(getPeerAddress())          // 同理, 保存了对端协议地址, 由 m_peerAddr 保存，m_peerAddr -> InetAddress <- getPeerAddress()
+, m_isShutdownWrite(false)    
 , m_loop(loop)                          // 将 EventLoop 指针传进来 -- 通过 EventLoop::handleNewConnection 
 {
-    cout << "   TcpConnection(int) -- over!" << endl;
+    cout << "   TcpConnection(int, loop) -- over!" << endl;
 }
 
 string TcpConnection::receive()
@@ -105,6 +106,30 @@ void TcpConnection::sendInLoop(const string & msg)
         m_loop->runInLoop(std::bind(&TcpConnection::send, this, msg));
     }
     cout << "   -- TcpConnection::sendInLoop Over" << endl;
+}
+
+void TcpConnection::sendInLoop(const TLV & data)
+{
+    cout << "   TcpConnection::sendInLoop(TLV) -- " << endl; 
+
+    // 这个函数负责将TLV格式的数据发送给客户端
+
+    int  tlvlen = 8 + data.length;
+    string msg;                                 // 先构造空间
+    msg.assign((const char *)&data, tlvlen);    // 再拷贝内容
+    sendInLoop(msg);
+
+    cout << "   -- TcpConnection::sendInLoop(TLV) Over!" << endl;
+}
+
+int TcpConnection::readPacket(Packet & packet)
+{
+    cout << "   TcpConnection::readPacket -- " << endl;
+    
+    // 调用 SocketIO 读取客户端的packet信息
+    return m_sockIO.readPacket(packet); 
+    
+    cout << "   -- TcpConnection::readPacket Over!" << endl;
 }
 
 InetAddress TcpConnection::getLocalAddress()

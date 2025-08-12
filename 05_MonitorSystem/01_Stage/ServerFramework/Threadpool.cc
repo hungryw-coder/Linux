@@ -2,6 +2,11 @@
 
 #include <unistd.h>
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 namespace wdf
 {
 
@@ -13,6 +18,8 @@ Threadpool::Threadpool(size_t threadNum, size_t queSize)
 , isExit(false)                     // 线程池退出标识位置为 false
 {
     m_threads.reserve(threadNum);   // 预留线程空间 -- 避免扩容的额外内存开销
+    
+    cout << "   Threadpool(threadNum, queSize) -- Over!" << endl;
 }
 
 void Threadpool::start() 
@@ -34,6 +41,8 @@ void Threadpool::start()
     for (auto & ele : m_threads) {
         ele->start();   // 由 wdf::Thread 的内容可知，在创建线程的同时，线程入口函数会执行 Thread::m_cb() 回调函数
     }
+    
+    cout << "   Threadpool::start -- 创建 " << m_threadNum  << " 个线程对象，并为每个线程绑定任务doTask，随后启动线程 Over!" << endl;
 }
 
 
@@ -53,16 +62,20 @@ void Threadpool::stop()
     for (auto & ele : m_threads) {
         ele->join();
     }
+
+    cout << "   Threadpool::stop -- 已关闭线程池 Over!" << endl;
 }
 
 void Threadpool::addTask(Task && task) // 充当生产者角色
 {
     // 任务需要在主线程中加入 
 
-    // 以指针的形式传递任务 --- 需要修改 TaskQueue 中 push 方法的传参类型
+    // 以函数对象形式传递任务 --- 需要修改 TaskQueue 中 push 方法的传参类型
     if (task) {
         m_taskQue.push(std::move(task));
     }
+    
+    cout << "   Threadpool::addTask -- Over!" << endl;
 }
 
 void Threadpool::doTask() 
@@ -84,6 +97,11 @@ void Threadpool::doTask()
                                         //          在 TaskQueue 新增唤醒函数
         if (task) {
             task();                     // 执行任务 -- task 为函数对象 function<void()>
+
+            cout << "   Threadpool::doTask -- popTask and excute MyTask Over" << endl;
+
+            // 因为线程绑定的是此处的doTask函数（Thread的构造函数，构造完均走到线程入口函数中，跳转到此处的pop中）
+            // 一旦有任务添加进来，线程从pop跳出来，执行任务
         }
     }
 

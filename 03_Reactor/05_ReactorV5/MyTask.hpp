@@ -31,7 +31,8 @@ public:
         // encode
 
         string response = m_msg;
-        m_conn->sendInLoop(response);   
+        m_conn->sendInLoop(response);                       // 就是让线程池去调用TcpConnection::send 发送response 给 client 
+        cout << "MyTask::process sendInLoop Over!" << endl;
         // 执行流程
         // TcpConnection::sendInLoop(msg) -> EventLoop::runInLoop(TcpConnection::send) -> EventLoop::wakeup -> EventLoop::waitFd -> handleReadEvent -> doPendingFunctors -> TcpConnection::send
         //                                                                             -> push_back(TcpConnection::send)                               

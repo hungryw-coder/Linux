@@ -17,7 +17,6 @@ SocketIO::SocketIO(int fd)
 
 int SocketIO::sendn(const char * buff, int len)
 {
-    cout << "   SocketIO::sendn --";
     int remaining = len;        // 剩余需要读取的字节数
     const char * p = buff;      // 当前读取位置
 
@@ -35,13 +34,12 @@ int SocketIO::sendn(const char * buff, int len)
         p += ret;
     }
 
-    cout << " send " << len - remaining << "bytes, msg = " << buff << endl;
+    cout << "   SocketIO::sendn -- send " << len - remaining << "bytes, msg = " << buff << endl;
     return len - remaining;
 }
 
 int SocketIO::recvn(char * buff, int len)
 {
-    cout << "   SocketIO::recvn -- ";
     int remaining = len;
     char * p = buff;
     
@@ -62,7 +60,7 @@ int SocketIO::recvn(char * buff, int len)
         p += ret;
     }
 
-    cout << "recv " << len - remaining << " bytes, msg = " << buff << endl;
+    cout << "   SocketIO::recvn -- recv " << len - remaining << " bytes, msg = " << buff << endl;
     return len - remaining; // 实际接收的字节数 
 }
 
@@ -135,8 +133,6 @@ int SocketIO::recvPeek(char * buff, int maxlen) const
     // 窥探（peek）套接字接收缓冲区中的数据，但不会真正移除数据（使用 MSG_PEEK 标志）
     // 它主要用于预检查数据（例如查找 \n 换行符），而不会影响 TCP 接收窗口
     
-    cout << "   SocketIO::recvPeek -- ";
-
     int ret = 0;
     do {
         ret = recv(m_fd, buff, maxlen, MSG_PEEK );                  // 从 _fd 套接字读取最多 maxlen 字节到 buff
@@ -146,13 +142,45 @@ int SocketIO::recvPeek(char * buff, int maxlen) const
     } while(ret == -1 && errno == EINTR);
 
     if (ret < 0) {
-        cerr << "recv failed: " << strerror(errno) << endl;
+        cerr << "   SocketIO::recvPeek -- recv failed: " << strerror(errno) << endl;
     } else if (ret == 0) {
-        cout << "connection closed by peer" << endl;
+        cout << "   SocketIO::recvPeek -- connection closed by peer" << endl;
     }
 
-    cout << "recvPeek: peek " << ret << " bytes" << endl;
+    cout << "   SocketIO::recvPeek -- recvPeek: peek " << ret << " bytes" << endl;
     return ret;                                 // 返回实际窥探到的字节数（可能 < maxlen，取决于缓冲区数据量）
+}
+
+int SocketIO::readPacket(Packet & packet)
+{
+    cout << "   SocketIO::readPacket -- " << endl;
+
+    // 接收从客户端发来的消息(packet)
+
+    // TLV： type(4B)|length(4B)| value
+    // 当legnth为0时，表示没有value
+    // type+length 可以认为是packet的header头部
+    // value 可以认为是packet的body消息体
+    
+    int type, length;
+    recvn((char *)& type, sizeof(type));
+    recvn((char *)& length, sizeof(length));
+
+    if (length > 0) {
+        char * pbuf = new char[length + 1]();
+        int ret = recvn(pbuf, length);      // 确保读取 length 个字节的数据，
+        packet.type = type;
+        packet.length = length;
+        packet.msg.assign(pbuf, length);    // 赋值length个字节的数据，保存到string中
+        delete [] pbuf;                     // 释放空间
+        
+        cout << "   -- SocketIO::readPacket read = " << 8 + ret << endl;
+        return 8 + ret;
+    }
+
+    cout << "   -- SocketIO::readPacket read = 8" << endl;
+
+    return 8;
 }
 
 }

@@ -17,7 +17,7 @@ TcpConnection::TcpConnection(int fd, EventLoop * loop)
 , m_peerAddr(getPeerAddress())          // 同理, 保存了对端协议地址, 由 m_peerAddr 保存，m_peerAddr -> InetAddress <- getPeerAddress()
 , m_loop(loop)                          // 将 EventLoop 指针传进来 -- 通过 EventLoop::handleNewConnection 
 {
-    cout << "   TcpConnection(int) -- over!" << endl;
+    cout << "   TcpConnection(int, loop) -- over!" << endl;
 }
 
 string TcpConnection::receive()

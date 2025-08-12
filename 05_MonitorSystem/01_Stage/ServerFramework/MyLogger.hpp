@@ -24,44 +24,58 @@ public:
     }
     
     // 初始化日志系统
-    void init(const string & logFilePath = "logs/smart_camera.log", 
+    void init(const string & logFilePath = "./logs/server.log", 
               bool asyncMode = true,
               size_t queueSize = 8192,
               size_t threadNum = 1);
 
-    // 记录用户注册操作
-    void logUserRegistration(const string & username, const string & ip);
+    // 设置日志级别
+    void setLogLevel(spdlog::level::level_enum level);
 
-    // 记录用户登陆操作
-    void logUserLogin(const string & username, const string & ip);
-        
-    // 记录用户查看摄像头操作
-    void logCameraView(const string & username, int cameraId, const string & details);
+    // 通用日志接口
+    template <typename... Args>
+    void log(spdlog::level::level_enum lvl, const string& format, Args&&... args)
+    {
+        if (!m_initialied) return;
 
-    // 使用异步日志记录摄像头事件
-    void logCameraEvent(int cameraId, const string & eventType, const string & details);
+        m_logger->log(lvl, format, std::forward<Args>(args)...);
 
-    // 关键系统操作使用同步日志确保写入
-    void logCriticalSystemEvent(const string & component, const string & event);
+        // 同步模式或错误级别以上立即刷新
+        if (!m_async_mode || lvl >= spdlog::level::warn) {
+            m_logger->flush();
+        }
+    }
 
+    // 用户行为日志
+    void logUserAction(const string& category, const string& username, const string& action);
+    
+    // 设备事件日志
+    void logDeviceEvent(int deviceId, const string& deviceType, const string& event);
+    
+    // 调试日志
+    void logDebug(const string & event) { log(spdlog::level::info, "Debug - '{}'", event); }
+
+    // 关键系统事件（强制同步）
+    void logCritical(const string& component, const string& event);
+    
     // 性能日志
-    void logPerformance(const string & operation, long durationMs);
-
-    // 安全相关日志
-    void logSecurityEvent(const string & event, const string & details);
-
-    // 视频流相关日志
-    void logStreamingEvent(int cameraId, const string & event, const string & details);
-
+    void logPerformance(const string& operation, long durationMs);
+    
+    // 安全事件日志
+    void logSecurityEvent(const string& event, const string& details);
+    
+    // 视频流日志
+    void logStreamingEvent(int cameraId, const string& event, const string& details);
+    
     // 手动刷新日志
     void flush();
-
+    
     // 关闭日志系统
     void shutdown();
-
+    
     // 检查是否初始化
     bool isInitialized() const { return m_initialied; }
-
+    
 private:
     // 私有化构造、析构函数，禁用拷贝与赋值
     MyLogger() {}
@@ -70,11 +84,11 @@ private:
     MyLogger operator=(const MyLogger &) = delete;
 
 private:
-    // 同步日志器
-    shared_ptr<spdlog::logger>          m_sync_logger;
+    // 统一使用单个日志器
+    shared_ptr<spdlog::logger> m_logger;
 
-    // 异步日志器
-    shared_ptr<spdlog::async_logger>    m_async_logger;
+    // 记录当前模式
+    bool m_async_mode = false;
 
     // 初始化标志位
     bool m_initialied = false;

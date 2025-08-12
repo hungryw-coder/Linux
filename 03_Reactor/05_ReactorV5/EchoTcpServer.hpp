@@ -22,13 +22,15 @@ public:
             std::bind(&EchoTcpserver::onMessage, this, _1),
             std::bind(&EchoTcpserver::onClose, this, _1));
 
-        cout << "EchoTcpserver(port, ip, threadNum, queSize) And set TcpServer::setAllCallbacks -- Over" << endl; 
+        cout << "   EchoTcpserver(port, ip, threadNum, queSize) And set TcpServer::setAllCallbacks -- Over" << endl; 
     }
     
     void start() 
     {
         m_threadpool.start();
         m_server.start();
+
+        cout << "   EchoTcpserver::start Over!" << endl;
     }
 
 private:
@@ -41,7 +43,9 @@ private:
     {
         // onMessage 函数执行在IO线程中， 该函数对象在执行时，时间不宜过长，否则会影响并发的执行
         
-        // read
+        cout << ">>>> onMessage " << endl;
+
+        // client info
         string msg = conn->receive();
         cout << "\n[Main] >>>> recv: " <<  msg << endl << endl;
 
@@ -51,8 +55,11 @@ private:
         
         // 往线程池中添加任务
         MyTask task(msg, conn);
+        cout << ">>>> MyTask task(msg, conn)" << endl;
         m_threadpool.addTask(std::bind(&MyTask::process, task));
-        // 当计算线程处理完毕后，再交给IO线程进行发送
+        // 当计算线程处理(doTask(创建线程的时候被绑定到构造函数了，各线程均卡在doTask中的pop中，start后等待任务到来时，跳出pop，执行process))完毕后，再交给IO线程进行发送
+        
+        cout << ">>>> m_threadpool.addTask(bind(MyTask::process)) Over" << endl;
 
         // 回显
         // string response = msg;

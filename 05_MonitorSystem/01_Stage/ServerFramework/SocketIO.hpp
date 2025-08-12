@@ -1,6 +1,8 @@
 #ifndef SOCKETIO_HPP
 #define SOCKETIO_HPP
 
+#include "Message.hpp"
+
 namespace wdf
 {
 
@@ -17,6 +19,7 @@ public:
     
     int recvPeek(char * buff, int max) const;       // 窥探套接字接收缓冲区的数据（不移动）
 
+    int readPacket(Packet & packet);                // 从对端读取Packet消息
 private:
     int m_fd;   // 对端文件描述符（客户端）
 };

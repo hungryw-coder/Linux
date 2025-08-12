@@ -3,6 +3,7 @@
 
 #include "Acceptor.hpp"
 #include "EventLoop.hpp"
+#include "MyLogger.hpp"
 #include <iostream>
 
 using std::cout;
@@ -35,6 +36,9 @@ public:
     void start()
     {
         cout << "   TcpServer::start -- " << endl;
+
+        wdf::MyLogger::getInstance().logCritical("Monitor Server Start", m_acceptor.ip() + ":" + std::to_string(m_acceptor.port()));
+        
         m_acceptor.ready();     // 服务端的准备工作
         m_loop.loop();          // 开始事件循环
         cout << "   -- TcpServer::start Over" << endl;

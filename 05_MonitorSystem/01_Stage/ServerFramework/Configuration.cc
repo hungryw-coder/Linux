@@ -17,7 +17,7 @@ bool Configuration::loadConfig(const string & filename)
 {
     ifstream file(filename);    
     if (!file.is_open()) {
-        cerr << "Failed to open config file: " << filename;
+        cerr << "Failed to open config file: " << filename << endl; 
         return false;
     }
 

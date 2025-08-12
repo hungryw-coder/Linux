@@ -23,7 +23,7 @@ void Acceptor::ready()
     setReusePort(true);
     bind();
     listen();
-    cout << "   -- Accepto::ready Over" << endl;
+    cout << "   -- Acceptor::ready Over" << endl;
 }
 
 void Acceptor::setReuseAddr(bool on)

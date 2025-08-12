@@ -2,6 +2,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 namespace wdf
 {
@@ -11,7 +15,7 @@ Thread::Thread(ThreadCallback && cb)
 , m_isRunning(false)
 , m_cb(std::move(cb))
 {
-
+    cout << "   Thread(ThreadCallback && cb) -- cb = Threadpool::doTask Over!" << endl;
 }
 
 Thread::~Thread()
@@ -28,6 +32,7 @@ void Thread::start()
         }
         m_isRunning = true;
     }
+    cout << "   Thread::start -- Create current thread And waiting ThreadCallback function(Threadpool::doTask) come. Over!" << endl;
 }
 
 // 此函数为静态成员函数，没有 this 指针 --- 无法直接获取 Thread 对象 --- 但可以通过线程入口函数的参数来传递
@@ -47,6 +52,7 @@ void Thread::join()
         pthread_join(m_pthid, nullptr); // 等待子线程结束，再往下执行
         m_isRunning = false;
     }
+    cout << "   Thread::join -- Current Over!" << endl;
 }
 
 } 
