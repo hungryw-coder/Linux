@@ -1,0 +1,145 @@
+[2025-08-14 20:51:56.131] [17298] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 20:51:56.131] [17298] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 20:52:27.409] [17298] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:57729'
+[2025-08-14 20:54:11.250] [17298] [info] Debug - '192.168.198.1:57729 had closed.'
+[2025-08-14 21:00:31.270] [17322] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 21:00:31.271] [17322] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 21:00:33.834] [17322] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:57877'
+[2025-08-14 21:34:22.893] [18562] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 21:34:22.894] [18562] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 21:35:04.615] [18562] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:58604'
+[2025-08-14 21:39:45.161] [18562] [info] Debug - '192.168.198.1:58604 had closed.'
+[2025-08-14 21:40:16.056] [18651] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 21:40:16.057] [18651] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 21:40:27.535] [18651] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:58692'
+[2025-08-14 21:42:40.893] [18732] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 21:42:40.894] [18732] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 21:42:47.410] [18732] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:58727'
+[2025-08-14 22:20:19.058] [18833] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 22:20:19.059] [18833] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 22:21:20.752] [18833] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:60049'
+[2025-08-14 22:23:11.276] [18833] [info] Debug - '192.168.198.1:60049 had closed.'
+[2025-08-14 23:24:37.819] [19568] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 23:24:37.820] [19568] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 23:25:25.757] [19568] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61756'
+[2025-08-14 23:58:04.803] [20315] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 23:58:04.804] [20315] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 23:58:08.766] [20315] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61844'
+[2025-08-15 00:01:18.421] [20492] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:01:18.421] [20492] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:01:28.165] [20492] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61869'
+[2025-08-15 00:05:23.928] [20665] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:05:23.929] [20665] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:05:29.931] [20665] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61906'
+[2025-08-15 00:07:03.360] [20797] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:07:03.362] [20797] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:07:09.634] [20797] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61917'
+[2025-08-15 00:14:40.978] [20917] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:14:40.979] [20917] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:14:58.050] [20917] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61967'
+[2025-08-15 00:16:22.986] [20990] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:16:22.988] [20990] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:16:24.943] [20990] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:61976'
+[2025-08-15 00:23:30.640] [21529] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:23:30.641] [21529] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:23:35.129] [21529] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:62024'
+[2025-08-15 00:31:08.224] [21963] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:31:08.225] [21963] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:31:12.727] [21963] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:62086'
+[2025-08-15 00:39:48.087] [22173] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 00:39:48.088] [22173] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 00:39:51.473] [22173] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:62149'
+[2025-08-15 10:00:45.000] [2996] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:00:45.001] [2996] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:00:59.360] [2996] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:49968'
+[2025-08-15 10:03:44.258] [2996] [info] Debug - '192.168.198.1:49968 had closed.'
+[2025-08-15 10:04:10.209] [2996] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:49990'
+[2025-08-15 10:15:07.166] [3375] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:15:07.168] [3375] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:15:12.153] [3375] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50061'
+[2025-08-15 10:19:18.759] [3669] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:19:18.760] [3669] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:19:32.861] [3713] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:19:32.862] [3713] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:19:38.278] [3713] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50096'
+[2025-08-15 10:21:48.540] [3874] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:21:48.540] [3874] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:21:52.338] [3874] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50111'
+[2025-08-15 10:24:37.309] [4074] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:24:37.310] [4074] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:24:44.326] [4074] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50122'
+[2025-08-15 10:58:46.833] [4539] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 10:58:46.834] [4539] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 10:58:57.770] [4539] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50517'
+[2025-08-15 11:23:21.520] [5285] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 11:23:21.521] [5285] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 11:23:34.000] [5285] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50699'
+[2025-08-15 11:27:30.946] [5722] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 11:27:30.947] [5722] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 11:27:34.775] [5722] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50743'
+[2025-08-15 11:31:25.446] [5735] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 11:31:25.447] [5735] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 11:31:42.882] [5735] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50775'
+[2025-08-15 11:34:03.137] [5735] [info] Debug - '192.168.198.1:50775 had closed.'
+[2025-08-15 11:34:09.773] [5743] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 11:34:09.774] [5743] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 11:34:14.279] [5743] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50798'
+[2025-08-15 11:38:43.048] [5763] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 11:38:43.049] [5763] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 11:38:49.367] [5763] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50843'
+[2025-08-15 11:44:45.683] [5763] [info] Debug - '192.168.198.1:50843 had closed.'
+[2025-08-15 11:46:29.724] [5781] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 11:46:29.725] [5781] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 11:46:40.841] [5781] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50929'
+[2025-08-15 11:50:03.075] [5781] [info] Debug - '192.168.198.1:50929 had closed.'
+[2025-08-15 11:50:31.881] [5781] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50969'
+[2025-08-15 11:50:54.640] [5781] [info] Debug - '192.168.198.1:50969 had closed.'
+[2025-08-15 11:50:58.896] [5781] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:50975'
+[2025-08-15 11:51:47.779] [5781] [info] Debug - '192.168.198.1:50975 had closed.'
+[2025-08-15 11:54:46.244] [5781] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51011'
+[2025-08-15 11:54:51.725] [5781] [info] Debug - '192.168.198.1:51011 had closed.'
+[2025-08-15 11:55:09.977] [5781] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51015'
+[2025-08-15 12:00:12.477] [5781] [info] Debug - '192.168.198.1:51015 had closed.'
+[2025-08-15 12:11:53.903] [6029] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 12:11:53.903] [6029] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 12:11:59.030] [6029] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51128'
+[2025-08-15 12:13:12.151] [6129] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 12:13:12.153] [6129] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 12:13:18.694] [6129] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51142'
+[2025-08-15 12:16:36.081] [6129] [info] Debug - '192.168.198.1:51142 had closed.'
+[2025-08-15 12:18:53.765] [6397] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 12:18:53.765] [6397] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 12:19:08.941] [6397] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51212'
+[2025-08-15 12:26:45.844] [7009] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 12:26:45.846] [7009] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 12:26:55.078] [7009] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51330'
+[2025-08-15 13:22:53.155] [7410] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 13:22:53.156] [7410] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 13:23:03.823] [7410] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51849'
+[2025-08-15 13:35:31.231] [7786] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 13:35:31.232] [7786] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 13:35:38.667] [7786] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51938'
+[2025-08-15 13:36:45.825] [7852] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 13:36:45.827] [7852] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 13:36:50.506] [7852] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51953'
+[2025-08-15 13:42:54.407] [7965] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 13:42:54.409] [7965] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 13:43:06.346] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52028'
+[2025-08-15 13:44:45.301] [7965] [info] Debug - '192.168.198.1:52028 had closed.'
+[2025-08-15 13:46:49.216] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52048'
+[2025-08-15 13:49:37.196] [7965] [info] Debug - '192.168.198.1:52048 had closed.'
+[2025-08-15 13:57:47.730] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52114'
+[2025-08-15 13:58:18.311] [7965] [info] Debug - '192.168.198.1:52114 had closed.'
+[2025-08-15 14:17:57.322] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52391'
+[2025-08-15 14:22:43.233] [7965] [info] Debug - '192.168.198.1:52391 had closed.'
+[2025-08-15 14:22:55.498] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52419'
+[2025-08-15 14:23:19.349] [7965] [info] Debug - '192.168.198.1:52419 had closed.'
+[2025-08-15 14:43:59.324] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52594'
+[2025-08-15 14:44:33.275] [7965] [info] Debug - '192.168.198.1:52594 had closed.'
+[2025-08-15 14:50:37.502] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52667'
+[2025-08-15 14:53:11.441] [7965] [info] Debug - '192.168.198.1:52667 had closed.'
+[2025-08-15 14:53:25.531] [7965] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52690'
+[2025-08-15 14:53:49.187] [7965] [info] Debug - '192.168.198.1:52690 had closed.'
+[2025-08-15 15:27:48.713] [8307] [info] Logger initialized successfully. Mode: Async
+[2025-08-15 15:27:48.714] [8307] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-15 15:27:59.753] [8307] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52936'

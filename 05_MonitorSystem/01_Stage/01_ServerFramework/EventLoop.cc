@@ -109,7 +109,7 @@ void EventLoop::waitEpollFd()
                 cout << "   -- waitEpollFd handleReadEvent and doPendingFunctors Over" << endl;
             } else {
                 // 处理已连接的事件(Client)
-                handleMessage(fd);
+                handleMessage(fd);      
                 cout << "   -- waitEpollFd handleMessage Over" << endl;
             }
         }
@@ -132,6 +132,7 @@ void EventLoop::handleNewConnection()
 
 void EventLoop::handleMessage(int fd) 
 {
+    // 执行服务端的onMessage函数
     cout << "   EventLoop::handleMessage -- " << endl;
     auto iter = m_conns.find(fd);   // 通过fd查找到对应的Tcp对象
     if (iter != m_conns.end()) {    // 找到fd对应对象

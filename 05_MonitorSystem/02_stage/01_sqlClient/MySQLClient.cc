@@ -5,6 +5,9 @@ using std::cerr;
 using std::endl;
 using std::cin;
 
+namespace wdf
+{
+
 MySQLClient::MySQLClient()
 : m_conn(nullptr)
 , m_res(nullptr)
@@ -25,17 +28,19 @@ MySQLClient::~MySQLClient()
     }
 }
 
-void MySQLClient::init() 
+bool MySQLClient::init() 
 {
     m_conn = mysql_init(nullptr);
     if (m_conn == nullptr) {
-        cerr << "mysql_init 失败: " << mysql_error(m_conn) << endl;
-    } else {
-        cout << "mysql_init 成功" << endl;
-    }
+        cerr << ">>> mysql_init 失败: " << mysql_error(m_conn) << endl;
+        return false;
+    } 
+
+    cout << ">>> mysql_init 成功" << endl;
+    return true;
 }
 
-void MySQLClient::connect(const string & host,
+bool MySQLClient::connect(const string & host,
                           const string & user,
                           const string & passwd,
                           const string & db,
@@ -54,28 +59,33 @@ void MySQLClient::connect(const string & host,
                                 nullptr,
                                 0);
     if (m_conn == nullptr) {
-        cerr << "mysql_real_connect 失败: " 
-             << mysql_error(m_conn) << endl;
-    } else {
-        cout << "mysql_real_connect 成功" << endl;
-    }
+        cerr << ">>> mysql_real_connect 失败: " << mysql_error(m_conn) << endl;
+        return false;
+    } 
+    
+    cout << ">>> mysql_real_connect 成功" << endl;
+    return true;
 }
 
 bool MySQLClient::writeOperationQuery(const string & sql)
 {
     if (m_conn == nullptr) {
-        cerr << "未连接到数据库" << endl;
+        cerr << ">>> mysql 未连接到数据库" << endl;
         return false;
     } 
 
     int ret = mysql_real_query(m_conn, sql.c_str(), sql.length());
     if (ret != 0) { // 成功返回0
-        cerr << "mysql_real_query 失败: "
+        cerr << ">>> mysql_real_query 失败: "
              << mysql_error(m_conn) << endl;
-        return false;
+        return false;   
     } 
 
     cout << "Query OK, " << mysql_affected_rows(m_conn) << " row(s) affected." << endl;
+    if (mysql_affected_rows(m_conn) == 0) {
+        cout << "Write Failed!. " << endl;
+        return false;
+    }
     return true;
 }
 
@@ -84,14 +94,14 @@ vector<vector<string>> MySQLClient::readOperationQuery(const string & sql)
     vector<vector<string>> result;
 
     if (m_conn == nullptr) {
-        cerr << "未连接到数据库" << endl;
+        cerr << ">>> mysql 未连接到数据库" << endl;
         return result;
     } 
         
     // 执行查询     
     int ret = mysql_real_query(m_conn, sql.c_str(), sql.length());
     if (ret != 0) {
-        cerr << "mysql_real_query 失败 " 
+        cerr << ">>> mysql_real_query 失败 " 
              << mysql_error(m_conn) << endl;
         return result;
     } 
@@ -100,9 +110,9 @@ vector<vector<string>> MySQLClient::readOperationQuery(const string & sql)
     m_res = mysql_store_result(m_conn);
     if (!m_res) {
         if (mysql_field_count(m_conn) == 0) {
-            cout << "非查询操作" << endl;
+            cout << ">>> mysql 非查询操作" << endl;
         } else {
-            cerr <<  "获取结果集失败: " << mysql_error(m_conn) << endl;
+            cerr <<  ">>> mysql 获取结果集失败: " << mysql_error(m_conn) << endl;
         }
         return result;
     }
@@ -113,7 +123,7 @@ vector<vector<string>> MySQLClient::readOperationQuery(const string & sql)
 
     // cout << rows << " rows, " << cols << " cols." << endl << endl;
     
-    // 打印表头
+    // save表头
     MYSQL_FIELD * fields = mysql_fetch_fields(m_res); 
     vector<string> headerRow;
     for (int i = 0; i < cols; ++i) {                    // 获取字段名
@@ -121,7 +131,7 @@ vector<vector<string>> MySQLClient::readOperationQuery(const string & sql)
     }
     result.push_back(headerRow);
     
-    // 打印数据
+    // save数据
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(m_res)) != nullptr) {     // 打印每一行的数据
         vector<string> rowData;
@@ -133,3 +143,19 @@ vector<vector<string>> MySQLClient::readOperationQuery(const string & sql)
     
     return result;
 }
+
+void MySQLClient::printAll(const vector<vector<string>> & res)
+{
+    cout << endl;
+    for (auto & vec : res) {
+        for (auto & field : vec) {
+            cout << field << "\t";
+        }
+        cout << endl;
+    }
+    cout << "current set has " << res.size() << " row(s). \n" << endl;
+    cout << endl;
+}
+
+}
+

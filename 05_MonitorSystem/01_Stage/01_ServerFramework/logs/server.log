@@ -31,3 +31,35 @@
 [2025-08-12 23:16:16.404] [44050] [info] Debug - '127.0.0.1:8080 --> 127.0.0.1:38042'
 [2025-08-12 23:16:21.637] [44053] [info] [localhost[server]] User 'root' send setting
 [2025-08-12 23:16:35.801] [44054] [info] [User] User 'root' login success
+[2025-08-13 19:19:36.575] [3723] [info] Logger initialized successfully. Mode: Async
+[2025-08-13 19:19:36.576] [3723] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-13 19:20:08.789] [3723] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51728'
+[2025-08-13 19:20:48.862] [3726] [info] [localhost[server]] User 'root' send setting
+[2025-08-13 19:20:48.864] [3727] [info] [User] User 'root' login failed
+[2025-08-13 19:49:17.755] [3866] [info] Logger initialized successfully. Mode: Async
+[2025-08-13 19:49:17.756] [3866] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-13 19:50:20.715] [3866] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51833'
+[2025-08-13 19:50:48.899] [3869] [info] [localhost[server]] User 'root' send setting
+[2025-08-13 19:50:48.902] [3870] [info] [User] User 'root' login failed
+[2025-08-13 19:52:02.861] [3866] [info] Debug - '192.168.198.1:51833 had closed.'
+[2025-08-13 20:01:48.480] [3866] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:51891'
+[2025-08-13 20:03:57.240] [3872] [info] [localhost[server]] User 'root' send setting
+[2025-08-13 20:03:57.244] [3871] [info] [User] User 'root' login failed
+[2025-08-13 20:04:24.041] [3869] [info] [localhost[server]] User 'root' send setting
+[2025-08-13 20:04:24.042] [3870] [info] [User] User 'root' login failed
+[2025-08-13 20:21:54.883] [3926] [info] Logger initialized successfully. Mode: Async
+[2025-08-13 20:21:54.885] [3926] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-13 20:22:18.048] [3926] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:52233'
+[2025-08-13 20:23:06.731] [3929] [info] [localhost[server]] User 'root' send setting
+[2025-08-13 20:23:06.735] [3930] [info] [User] User 'root' login failed
+[2025-08-13 20:25:38.077] [3926] [info] Debug - '192.168.198.1:52233 had closed.'
+[2025-08-13 20:41:11.156] [4124] [info] Logger initialized successfully. Mode: Async
+[2025-08-13 20:41:11.157] [4124] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-13 20:41:23.265] [4124] [info] Debug - '127.0.0.1:8080 --> 127.0.0.1:43578'
+[2025-08-13 20:41:27.263] [4129] [info] [localhost[server]] User 'root' send setting
+[2025-08-13 20:41:43.524] [4127] [info] [User] User 'root' login success
+[2025-08-14 01:30:48.168] [19756] [info] Logger initialized successfully. Mode: Async
+[2025-08-14 01:30:48.169] [19756] [warning] [CRITICAL] Monitor Server Start - 0.0.0.0:8080
+[2025-08-14 01:31:13.145] [19756] [info] Debug - '192.168.198.132:8080 --> 192.168.198.1:54872'
+[2025-08-14 01:31:53.026] [19759] [info] [localhost[server]] User 'root' send setting
+[2025-08-14 01:31:53.028] [19760] [info] [User] User 'root' login failed
