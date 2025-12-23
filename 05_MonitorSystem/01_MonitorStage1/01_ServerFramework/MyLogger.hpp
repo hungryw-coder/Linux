@@ -16,7 +16,7 @@ namespace wdf
 class MyLogger
 {
 public:
-    // 获取单例实例ji
+    // 获取单例实例
     static MyLogger &  getInstance()
     {
         static  MyLogger instance;  // 利用静态局部变量的线程安全的特性 -- 由C++标准保证

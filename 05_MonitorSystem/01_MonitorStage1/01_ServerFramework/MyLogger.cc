@@ -106,7 +106,10 @@ void MyLogger::logPerformance(const string& operation, long durationMs)
 
 void MyLogger::logSecurityEvent(const string& event, const string& details) 
 {
-    log(spdlog::level::warn, "[SECURITY] {} - {}", event, details);
+    if (m_initialied) {
+        log(spdlog::level::warn, "[SECURITY] {} - {}", event, details);
+        m_logger->flush();
+    }
 }
 
 void MyLogger::logStreamingEvent(int cameraId, const string& event, const string& details) 

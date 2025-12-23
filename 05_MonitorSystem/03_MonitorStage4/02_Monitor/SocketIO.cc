@@ -1,0 +1,243 @@
+#include "SocketIO.hpp"
+#include <my_header.h>
+#include <iostream>
+
+using std::cerr;
+using std::endl;
+using std::cout;
+
+namespace wdf
+{
+
+SocketIO::SocketIO(int fd)
+:m_fd(fd)
+{
+    cout << "   SocketIO(int) -- m_fd = " << m_fd << endl;
+}
+
+int SocketIO::sendn(const char * buff, int len)
+{
+    cout << "   SocketIO::sendn -- len = " << len << endl;  
+
+    int remaining = len;        // 剩余需要读取的字节数
+    const char * p = buff;      // 当前读取位置
+
+    while (remaining > 0) {
+        // fla=0 ：如果内核发送缓冲区满，send 会阻塞，直到数据全部写入或出错
+        // 未处理 SIGPIPE：若对端关闭连接，进程可能被终止
+
+        int ret = ::send(m_fd, p, remaining, 0);
+        cout << "   SocketIO::sendn -- send's ret = " << ret << endl;
+        if (ret < 0) {
+            cerr << "send failed: " << strerror(errno) << endl;
+            return ret;
+        }
+        
+        remaining -= ret;
+        p += ret;
+    }
+
+    cout << "   SocketIO::sendn -- send " << len << " bytes, content = ";
+    for (int i = 0; i < std::min(len, 16); ++i) {
+        printf("%02x ", (unsigned char)buff[i]);
+    }
+    cout << endl;
+    return len;
+}
+
+int SocketIO::recvn(char * buff, int len)
+{
+    int remaining = len;
+    char * p = buff;
+    // time_t start = time(nullptr);
+    
+    cout << "   SocketIO::recvn -- len = " << len << endl; 
+
+    while (remaining > 0) {
+
+        // 添加5秒超时
+        // if (time(nullptr) - start > 5) {
+        //     cerr << ">>> recvn超时，剩余字节：" << remaining << endl;
+        //     return -1;
+        // }
+        
+        int ret = ::recv(m_fd, p, remaining, 0);
+
+        cout << "   SocketIO::recvn -- recv's ret = " << ret << endl;
+
+        if (ret == -1) {
+            if (errno == EINTR) {
+                continue; // 信号中断，重试
+            } 
+            cerr << "recv failed: " << strerror(errno) << endl;
+            return -1;
+
+        } else if (ret == 0) {
+            cerr << "   SocketIO::recvn -- 连接关闭" << endl;
+            return 0; // 对方已关闭连接
+        }
+
+        remaining -= ret; // 接收完全后，remaining 会变成 0
+        p += ret;
+    }
+
+    cout << "   SocketIO::recvn -- recv " << len << " bytes, content = ";
+    for (int i = 0; i < std::min(len, 16); ++i) {
+        printf("%02x ", (unsigned char)buff[i]);
+    }
+    cout << endl;
+
+    return len; // 实际接收的字节数 
+}
+
+
+int SocketIO::readline(char * buff, int maxlen)
+{   // maxlen: 缓冲区的最大容量（包括结尾的 \0）  buf: 存储读取数据的缓冲区
+    // 从套接字读取一行数据（以 \n 结尾）
+
+    cout << "   SocketIO::readline -- maxlen = "<< maxlen << endl;
+    int remaining = maxlen - 1;     // 剩余可读取的字节数（保留1字节给 \0）
+                                    // 可能会导致因maxlen过大，在没有找到换行符的情况下，
+                                    //      remianing 没有消耗完，会一直循环（循环条件 reamaining > 0），直至读够最大长度的内容
+    char * p = buff;                // 指向当前写入位置的指针
+    int total = 0;                  // 表示读取的总字节数
+    
+    while (remaining > 0) {
+        // 1. 窥探数据
+        int peek_len  = recvPeek(p, remaining);         // 使用 recvPeek 窥探数据而不移除
+        if (peek_len <= 0) {
+            // 对端关闭(0)或出错(-1)
+            if (peek_len < 0) {
+                cerr << "recvPeek error: " << strerror(errno) << endl;
+            }
+            break; // 退出循环
+        }
+
+        // 2. 查找换行符
+        for (int i = 0; i < peek_len; ++i) {
+            if (p[i] == '\n') {                         // 查找到'\n'
+                cout << "   >>> finded '/n' " << endl;
+                int toNSize = i + 1;                    // 计算要取多少字符(包含\n) i+1 是因为 i 从 0 开始
+                
+                // recvn 底层调的是 recv 函数
+                // 该函数的作用是在将数据从内核态读到用户态
+                // 是读取而不是赋值
+                // 读取完的数据，会在内核态的接收缓冲区中被删除
+                int n  = recvn(p, toNSize);             // 使用 recvn 实际读取数据
+                if (n != toNSize) {
+                    cerr << "Error: recv failed" << endl;
+                    return -1;
+                }
+                total += n;                             // 含\n的中总字节数
+                p[i] = '\0';                            // 将\n替换成C字符床结束符\0
+                cout << "   Find newline, recv " 
+                     << n << " bytes " << endl;
+                return total;                           // 返回已读取的总字节数（包含 \n）
+            }
+        }
+
+        // 3. 未找到换行符则消费所有窥探数据
+        int n = recvn(p, peek_len);                            
+        if (n != peek_len){
+            cerr << "[error] recv mismatch" << endl;
+            return -1;
+        } 
+        
+        p += n;
+        total += n;
+        remaining -= n;
+    }
+
+    // 当缓冲区将满但仍未找到 \n 时 
+    buff[maxlen - 1] = '\0';                                        // 确保字符串正确终止
+    cout << "   No newline found, recvn " << total << "bytes" << endl;
+    return (total > 0) ? total : 0;                                 // 返回最大可读字节数
+}
+
+int SocketIO::recvPeek(char * buff, int maxlen) const
+{
+    // 窥探（peek）套接字接收缓冲区中的数据，但不会真正移除数据（使用 MSG_PEEK 标志）
+    // 它主要用于预检查数据（例如查找 \n 换行符），而不会影响 TCP 接收窗口
+    
+    int ret = 0;
+    do {
+        ret = recv(m_fd, buff, maxlen, MSG_PEEK );                  // 从 _fd 套接字读取最多 maxlen 字节到 buff
+                                                                    // MSG_PEEK：仅窥探数据，不会从缓冲区移除（后续 recv() 仍可读取相同数据）
+                                                                    // Q1:当ret=0时，程序会卡在当前recv函数中，等待内核态的接收缓冲区有数据
+                                                                    //      - 修改flags 为MSG_PEEK | MSG_DONTWAIT
+    } while(ret == -1 && errno == EINTR);
+
+    if (ret < 0) {
+        cerr << "   SocketIO::recvPeek -- recv failed: " << strerror(errno) << endl;
+    } else if (ret == 0) {
+        cout << "   SocketIO::recvPeek -- connection closed by peer" << endl;
+    }
+
+    cout << "   SocketIO::recvPeek -- recvPeek: peek " << ret << " bytes" << endl;
+    return ret;                                 // 返回实际窥探到的字节数（可能 < maxlen，取决于缓冲区数据量）
+}
+
+int SocketIO::readPacket(Packet & packet)
+{
+    cout << "   SocketIO::readPacket -- " << endl;
+
+    // 接收从客户端发来的消息(packet)
+
+    // TLV： type(4B)|length(4B)| value
+    // 当legnth为0时，表示没有value
+    // type+length 可以认为是packet的header头部
+    // value 可以认为是packet的body消息体
+    
+    // 1. 读取type和length（严格检查8字节）
+
+
+     if (recvn((char *)&packet.type, sizeof(int)) != sizeof(packet.type)) {
+         cerr << "   SocketIO::readPacket -- 读取type失败" << endl;
+         return -1;
+     }
+     packet.type = ntohl(packet.type);
+    
+
+    if (recvn((char*)&packet.length, sizeof(packet.length)) != sizeof(packet.length)) {
+        cerr << "   SocketIO::readPacket -- 读取length失败" << endl;
+        return -1;
+    }
+    packet.length = ntohl(packet.length);
+
+    // 2. 读取消息体（动态分配改为直接写入string）
+     if (packet.length > 0) {
+         packet.msg.resize(packet.length); // 预分配空间
+         if (recvn(&packet.msg[0], packet.length) != packet.length) {
+             cerr << "   SocketIO::readPacket -- 读取消息体失败" << endl;
+             return -1;
+         }
+     }
+    
+     cout << "   SocketIO::readPacket -- 成功读取Packet: type=" << packet.type
+          << " length=" << packet.length
+          << " msg=" << packet.msg << endl;
+     return 8 + packet.length;
+
+     // int type, length;
+     // recvn((char *)& type, sizeof(type));
+     // recvn((char *)& length, sizeof(length));
+
+     // if (length > 0) {
+     //     char * pbuf = new char[length + 1]();
+     //     int ret = recvn(pbuf, length);      // 确保读取 length 个字节的数据，
+     //     packet.type = type;
+     //     packet.length = length;
+     //     packet.msg.assign(pbuf, length);    // 赋值length个字节的数据，保存到string中
+     //     delete [] pbuf;                     // 释放空间
+      
+     //     cout << "   -- SocketIO::readPacket read = " << 8 + ret << endl;
+     //     return 8 + ret;
+     // }
+
+     // cout << "   -- SocketIO::readPacket read = 8" << endl;
+     // return 8;
+}
+
+}
+
+

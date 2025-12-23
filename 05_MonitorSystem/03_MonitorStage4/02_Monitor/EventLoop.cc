@@ -101,6 +101,7 @@ void EventLoop::waitEpollFd()
                 handleNewConnection();      // 在这其中将client加入epoll中监听
                 cout << "   -- waitEpollFd handleNewConnection Over" << endl;
             } else if (fd == m_evtfd) {
+                // 处理 TcpConnection::send 任务 -- I/O 线程来进行，底层是调 SocketIO::sendn
                 // 构造函数中addEpollReadEvent(m_evtfd)之后，m_evtArr 中已经存了事件文件描述符
                 // 当wakeup后(即runInLoop后（不仅保存了sendInLoop发来的函数对象--任务，还wakeup通知了此处)
                 // 使得eventfd会触发读事件，进而 fd == m_evfd  
@@ -218,8 +219,10 @@ void EventLoop::wakeup()
     cout << "   EventLoop::wakeup -- 向内核计数器写值1，唤醒子线程, wakeup Over" << endl;
 }
 
+// 这个函数主要是用来转发服务器的响应（可以是函数）给客户端的
 void EventLoop::doPendingFunctors()
 {
+    // 这里的 m_pendings 中的任务是在 runInLoop 函数中添加的, 该任务可以是 TcpConnection::send 
     cout << "   EventLoop::doPendingFunctors -- " << endl; 
     vector<Functor> tmp;
 

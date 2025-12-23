@@ -206,18 +206,6 @@ void UserLoginSection1::process()
     }
 }
 
-void UserLoginSection1::getSetting(string & s, const char * passwd)
-{
-    int i,j;
-    //取出salt,i 记录密码字符下标，j记录$出现次数
-    for(i = 0,j = 0; passwd[i] && j != 4; ++i)
-    {
-        if(passwd[i] == '$') ++j;
-    }
-    char buff[128] = {0};
-    strncpy(buff, passwd, i);       // 将密码字符串的前 i 个字符（到第 4 个 $ 之前）拷贝到缓冲区
-    s.assign(buff, i);              // 拷贝到s中
-}
 
 void UserLoginSection2::process()
 {
